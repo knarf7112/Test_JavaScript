@@ -1,0 +1,27 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <style>
+        div{
+            margin:0px auto;
+            text-align:center;
+        }
+    </style>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <script type="text/javascript" src="JS/Permutation.js"></script>
+    <title>Permutation (排列組合測試)</title>
+    <script>
+        window.onload = function () {
+            var div1 = document.getElementById("permutation");
+            var allPermutation = recursive([1, 2, 3, 4], 0);
+            allPermutation.forEach(function (ele, index, obj) {
+                div1.innerHTML += ele + "<br>";
+            });
+        };
+    </script>
+</head>
+<body>
+    <div>排列組合</div>
+    <div id="permutation"></div>
+</body>
+</html>
