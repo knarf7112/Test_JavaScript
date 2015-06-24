@@ -1,1 +1,1 @@
-﻿<%@ Application Codebehind="Global.asax.cs" Inherits="Test_JavaScript.Global" Language="C#" %>
+﻿<%@ Application Codebehind="Global.asax.cs" Inherits="MyWebSite.Global" Language="C#" %>

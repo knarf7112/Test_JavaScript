@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.Security;
-using System.Web.SessionState;
 //
 using System.Web.Caching;
 
@@ -29,10 +24,10 @@ namespace MyWebSite
 
         protected void Application_BeginRequest(object sender, EventArgs e)
         {
-            var ss = this.Context.Request.QueryString["test"];
-            this.Context.Response.ContentType = "text/html";
-            this.Context.Response.Write(@"Test_quote.html");
-            this.Context.Response.ClearContent();
+            //var ss = this.Context.Request.QueryString["test"];
+            //this.Context.Response.ContentType = "text/html";
+            //this.Context.Response.Write(@"Test_quote.html");
+            //this.Context.Response.ClearContent();
         }
 
         protected void Application_AuthenticateRequest(object sender, EventArgs e)

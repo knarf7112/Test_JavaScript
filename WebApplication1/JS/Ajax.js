@@ -1,18 +1,19 @@
-﻿var callback = function (xhr) {
-    console.log("callback:");
-    console.log(xhr);
-    if (xhr.readyState == 4) {
-        if (xhr.status == 200) {
-            console.log("回傳成功:");
-            console.log(xhr.responseText);
+﻿var callback = function (event) {
+    //console.log("callback:");
+    //console.log(xhr);
+    if (this.readyState == 4 )
+        if (this.status == 200) {
+            //XMLHttpRequest Object call back
+            //console.log(this.responseText);
+            console.log("檔案傳輸完成 ...");
         }
         else {
-            alert('There was a problem with the request.');
+            console.log('There was a problem with the request.');
         }
-    }
+    
 }
 
-function Ajax(method, url, sendData, async) {
+function Ajax(method, url, sendCmd, async) {
     var xhr;
     if (window.XMLHttpRequest){
         xhr = new XMLHttpRequest();
@@ -34,14 +35,14 @@ function Ajax(method, url, sendData, async) {
     }
 
     xhr.open(method.toUpperCase(), url, async);
-    xhr.addEventListener("readstatechange", callback, false);
-    xhr.onload = function (data) {
-        console.log(data);
-    }
+    xhr.addEventListener("readystatechange", callback, false);
+    //xhr.onload = function (data) {
+    //    console.log(data);
+    //}
     if (method.toUpperCase() == "POST") {
         xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
     }
-    
-    xhr.send(sendData);
+    var data = "cmd=" + sendCmd ;
+    xhr.send(data);
 }
 

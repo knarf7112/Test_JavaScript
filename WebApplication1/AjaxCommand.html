@@ -5,23 +5,26 @@
     <script type="text/javascript" src="JS/Ajax.js"></script>
     <title></title>
     <script>
-        var url = "";
+        var url = "/CmdHandler.ashx";
         var button;
         window.onload = function () {
             button = document.getElementById("send");
             button.onclick = function () {
-                var text = document.getElementById("text1").value;
+                var text = document.getElementById("cmd").value;
                 console.log("Button click ...");
-                Ajax("GET", text, true);
+                Ajax("POST", url, text, true);
+                console.log("Run Ajax ...");
             }
         };
 
     </script>
 </head>
 <body>
+    <h1>測試用Ajax去後台取檔案</h1>
     <div>
-        <input type="text" id="text1" autofocus placeholder="please input select command"/>
-        <input type="button" id="send" value="Send" />
+        <input type="text" id="cmd" autofocus placeholder="please input command" width="25" value="GiveMeFile"/>
+        <input type="button" id="send" value="SendCommand" />
     </div>
+    <div id="Ans"></div>
 </body>
 </html>

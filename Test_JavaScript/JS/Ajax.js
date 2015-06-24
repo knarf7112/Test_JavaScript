@@ -12,7 +12,7 @@
     }
 }
 
-function Ajax(method, url, sendData, async) {
+function Ajax(method, url, sendCmd, async) {
     var xhr;
     if (window.XMLHttpRequest){
         xhr = new XMLHttpRequest();
@@ -34,14 +34,14 @@ function Ajax(method, url, sendData, async) {
     }
 
     xhr.open(method.toUpperCase(), url, async);
-    xhr.addEventListener("readstatechange", callback, false);
+    xhr.addEventListener("readystatechange", callback, false);
     xhr.onload = function (data) {
         console.log(data);
     }
     if (method.toUpperCase() == "POST") {
         xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
     }
-    
-    xhr.send(sendData);
+    var data = { cmd: sendCmd };
+    xhr.send(data);
 }
 
