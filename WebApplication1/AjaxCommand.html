@@ -1,0 +1,27 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <script type="text/javascript" src="JS/Ajax.js"></script>
+    <title></title>
+    <script>
+        var url = "";
+        var button;
+        window.onload = function () {
+            button = document.getElementById("send");
+            button.onclick = function () {
+                var text = document.getElementById("text1").value;
+                console.log("Button click ...");
+                Ajax("GET", text, true);
+            }
+        };
+
+    </script>
+</head>
+<body>
+    <div>
+        <input type="text" id="text1" autofocus placeholder="please input select command"/>
+        <input type="button" id="send" value="Send" />
+    </div>
+</body>
+</html>
