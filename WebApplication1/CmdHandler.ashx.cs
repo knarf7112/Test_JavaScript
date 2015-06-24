@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+//
+using System.Web.SessionState;
 
 namespace MyWebSite
 {
@@ -13,7 +15,6 @@ namespace MyWebSite
 
         public void ProcessRequest(HttpContext context)
         {
-            
             string cmd = string.Empty;
             string cmdIndex = "cmd";
             if (context.Request.Form[cmdIndex] != null)
@@ -27,8 +28,19 @@ namespace MyWebSite
             //string cmd2 = context.Request.
             if (!String.IsNullOrEmpty(cmd) && cmd == "GiveMeFile")
             {
-                
-                this.WriteFile(context);
+                try
+                {
+                    if (!MyWebSite.Global._MySession.ContainsKey(cmd))//HttpContext.Current.Session[HttpContext.Current.Session.SessionID] == null)
+                    {
+                        global::MyWebSite.Global._MySession.Add(cmd, "wrote File");
+                        //HttpContext.Current.Session[HttpContext.Current.Session.SessionID] = "wrote File";//Session物件是空的
+                    }
+                    this.WriteFile(context);
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
                 //string path = AppDomain.CurrentDomain.BaseDirectory + "App_Data\\";
                 //string fullPath = System.IO.Directory.GetFiles(path)[0];
                 //System.IO.FileInfo file = new System.IO.FileInfo(fullPath);
@@ -37,9 +49,44 @@ namespace MyWebSite
             }
             else
             {
-                context.Response.ContentType = "text/plain";
-                context.Response.Write("Hello World");
-                context.Response.Flush();
+                //Session物件是空的
+                //if (HttpContext.Current.Session[HttpContext.Current.Session.SessionID] == null)
+                //{
+                //    HttpContext.Current.Session[HttpContext.Current.Session.SessionID] = "wrote document";
+                //}
+                if (!MyWebSite.Global._MySession.ContainsKey(cmd))//HttpContext.Current.Session[HttpContext.Current.Session.SessionID] == null)
+                {
+                    global::MyWebSite.Global._MySession.Add(cmd, "wrote document");
+                    //HttpContext.Current.Session[HttpContext.Current.Session.SessionID] = "wrote File";//Session物件是空的
+                }
+                context.Response.ContentType = "text/html";
+                if (context.Request.Cookies["ServerCreate"] == null)
+                {
+                    HttpCookie cookie = new HttpCookie("ServerCreate", "伺服器偷傳的");
+                    cookie.Expires = DateTime.Now.AddMinutes(5);
+                    context.Response.AppendCookie(cookie);
+                }
+                HttpBrowserCapabilities bc = context.Request.Browser;
+                context.Response.Write("<p>Browser Capabilities:</p>");
+                context.Response.Write("Type = " + bc.Type + "<br>");
+                context.Response.Write("Name = " + bc.Browser + "<br>");
+                context.Response.Write("Version = " + bc.Version + "<br>");
+                context.Response.Write("Major Version = " + bc.MajorVersion + "<br>");
+                context.Response.Write("Minor Version = " + bc.MinorVersion + "<br>");
+                context.Response.Write("Platform = " + bc.Platform + "<br>");
+                context.Response.Write("Is Beta = " + bc.Beta + "<br>");
+                context.Response.Write("Is Crawler = " + bc.Crawler + "<br>");
+                context.Response.Write("Is AOL = " + bc.AOL + "<br>");
+                context.Response.Write("Is Win16 = " + bc.Win16 + "<br>");
+                context.Response.Write("Is Win32 = " + bc.Win32 + "<br>");
+                context.Response.Write("Supports Frames = " + bc.Frames + "<br>");
+                context.Response.Write("Supports Tables = " + bc.Tables + "<br>");
+                context.Response.Write("Supports Cookies = " + bc.Cookies + "<br>");
+                context.Response.Write("Supports VB Script = " + bc.VBScript + "<br>");
+                context.Response.Write("Supports JavaScript = " + bc.JavaScript + "<br>");
+                context.Response.Write("Supports Java Applets = " + bc.JavaApplets + "<br>");
+                context.Response.Write("Supports ActiveX Controls = " + bc.ActiveXControls + "<br>");
+                context.Response.Write("CDF = " + bc.CDF + "<br>");
             }
             //context.Response.ContentType = "text/plain";
             //context.Response.Write("Hello World");
