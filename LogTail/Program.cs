@@ -38,6 +38,8 @@ namespace LogTail
             {
                 Console.WriteLine("*************************************************");
                 Console.WriteLine(item.ToString());
+                //Console.WriteLine(item.Id.GetType());
+                //Console.WriteLine(item.Date.GetType());
                 Console.WriteLine("*************************************************");
             }
             //while (dr.Read())
@@ -58,6 +60,7 @@ namespace LogTail
             //    Console.WriteLine("第6欄:" + column6);
             //    Console.WriteLine("*************************************************");
             //}
+
             dr.Close();
             dr = null;
             dbCmd.Dispose();

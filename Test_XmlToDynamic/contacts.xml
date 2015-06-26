@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<contacts>
+  <contact id='1'>
+    <Qoo>test</Qoo>
+    <firstName>Michael</firstName>
+    <lastName>Jordan</lastName>
+    <age>40</age>
+    <dob>1965</dob>
+    <salary>100.35</salary>
+  </contact>
+  <contact id='2'>
+    <firstName>Scottie</firstName>
+    <lastName>Pippen</lastName>
+    <age>38</age>
+    <dob>1967</dob>
+    <salary>55.28</salary>
+  </contact>
+</contacts>

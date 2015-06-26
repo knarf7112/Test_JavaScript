@@ -15,7 +15,7 @@ namespace MyWebSite
         public static Dictionary<String,object> _MySession;
         protected void Application_Start(object sender, EventArgs e)
         {
-            
+            //被IIS執行起動的第一次進入點
             _MySession = new Dictionary<string, object>();
             //qq = new Cache(); 
             //Test_JavaScript.App_Code.TestRun tt = new App_Code.TestRun(){Name = "Qoo", Age = 18, IsRun = true};

@@ -31,12 +31,14 @@ namespace LogTail.Domain.Mapper
                 T row = new T();
                 //BindingFlags bf = BindingFlags.Public | BindingFlags.Instance;
                 PropertyInfo[] pi = row.GetType().GetProperties();//取得物件的所有屬性
+                //其實大於或小於都可以,看迴圈要怎走,主要只是怕mapping進去的屬性不對
                 if (pi.Length != dataReader.FieldCount)
                 {
                     throw new Exception("物件屬性數量(" + pi.Length + ")與資料庫Column數量(" + dataReader.FieldCount + ")不同,無法正確映射");
                 }
                 for(int i = 0; i < pi.Length; i++)
                 {
+                    //測試發現插入DateTime屬性時,資料表欄位值為日期時間格式,所以自動轉換成DateTime物件,並插入到此屬性
                     pi[i].SetValue(row, dataReader.GetValue(i), null);//將Row上的欄位值依序映射到此物件的屬性上
                 }
                 return row;

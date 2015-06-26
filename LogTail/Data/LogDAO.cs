@@ -10,13 +10,21 @@ namespace LogTail.Data
     {
         public string LogTable { get; set; }
 
-        IDbConnection conn;
+        private IDbConnection dbConnection;
+
+        private IDbCommand dbCommand;
+
+        public LogDAO()
+        {
+            dbConnection = new NpgsqlConnection();
+            
+        }
 
         public int GetMaxPk()
         {
             string getPk = @"select MAX(Id) from " + this.LogTable;
 
-            conn = new NpgsqlConnection();
+            //conn = new NpgsqlConnection();
             
             try
             {
