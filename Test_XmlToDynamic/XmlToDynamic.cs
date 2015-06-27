@@ -27,31 +27,36 @@ namespace Test_XmlToDynamic
                 if (node.Elements(node.Elements().First().Name.LocalName).Count() > 1)
                 {
                     //list
-                    var item = new ExpandoObject();//建立一個空
-                    var list = new List<dynamic>();
+                    var item = new ExpandoObject();//建立一個空物件(專門給動態用的物件)
+                    var list = new List<dynamic>();//建立一個裝載動態物件的列表(因為有超過一個以上同樣名稱)
+                    //var eles = node.Elements();//取得本層的所有子集合
+                    //迴圈遞迴跑內層的所有子集合(同樣名稱的)
                     foreach (var element in node.Elements())
                     {
                         Parse(list, element);
                     }
 
-                    AddProperty(item, node.Elements().First().Name.LocalName, list);
-                    AddProperty(parent, node.Name.ToString(), item);//這個要用到Microsoft.CSharp.Rumtime
+                    //將內層的結果(contact[0]和contact[1]存放在list列表上)接上<contacts>
+                    AddProperty(item, node.Elements().First().Name.LocalName, list);//用item物件來串接同樣名為contact的子集合=> key:contact value:List<dynamic>
+                    AddProperty(parent, node.Name.ToString(), item);//(這個要用到Microsoft.CSharp.Rumtime)//
                 }
                 else
                 {
+                    //用來掃描內層的集合
                     var item = new ExpandoObject();
 
+                    //檢查內層node的所有屬性,有的話就變成
                     foreach (var attribute in node.Attributes())
                     {
                         AddProperty(item, attribute.Name.ToString(), attribute.Value.Trim());
                     }
 
-                    //element
+                    //element 迴圈遞迴跑內層的所有子集合
                     foreach (var element in node.Elements())
                     {
                         Parse(item, element);
                     }
-                    //第二層
+                    //上面遞迴都掃完了所有內層元素,所以再接回父層
                     AddProperty(parent, node.Name.ToString(), item);
                 }
             }
@@ -79,7 +84,7 @@ namespace Test_XmlToDynamic
             }
             else
             {
-                //轉成IDictionary<String, object>集合並
+                //轉成IDictionary<String, object>集合
                 //表示為坎套的最底部(即只剩一個node跟node的value,沒有任何子node了)
                 (parent as IDictionary<String, object>)[name] = value;
                 //上面等同 =>  IDictionary<String, object> parentDic = parent as IDictionary<String, object>

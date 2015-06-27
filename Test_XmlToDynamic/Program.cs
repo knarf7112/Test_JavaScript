@@ -44,11 +44,11 @@ namespace Test_XmlToDynamic
 
             //read from file
             var xDoc = XDocument.Load(new StreamReader("contacts.xml"));
-
+            
             dynamic root = new ExpandoObject();
 
             XmlToDynamic.Parse(root, xDoc.Elements().First());
-
+            Console.WriteLine(root.contacts.contact[0].Qoo.qq);
             Console.WriteLine(root.contacts.contact.Count + "\t:" + root.contacts.contact.Count.GetType());
             Console.WriteLine(root.contacts.contact[0].Qoo + "\t:" + root.contacts.contact[0].Qoo.GetType());
             Console.WriteLine(root.contacts.contact[0].firstName + " :" + root.contacts.contact[0].firstName.GetType());
