@@ -84,7 +84,7 @@ namespace Test_XmlToDynamic
             }
             else
             {
-                //轉成IDictionary<String, object>集合
+                //若為ExpandoObject物件就轉成IDictionary<String, object>集合並將key和value插入
                 //表示為坎套的最底部(即只剩一個node跟node的value,沒有任何子node了)
                 (parent as IDictionary<String, object>)[name] = value;
                 //上面等同 =>  IDictionary<String, object> parentDic = parent as IDictionary<String, object>
