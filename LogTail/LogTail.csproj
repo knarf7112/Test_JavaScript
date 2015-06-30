@@ -39,6 +39,7 @@
       <HintPath>..\Libs\Npgsql.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.configuration" />
     <Reference Include="System.Data" />
     <Reference Include="System.XML" />
     <Reference Include="System.Xml.Linq" />
@@ -48,8 +49,11 @@
     <Compile Include="Business\ILogDumper.cs" />
     <Compile Include="Business\LogBatcher.cs" />
     <Compile Include="Business\LogDumper.cs" />
+    <Compile Include="Config\Node.cs" />
     <Compile Include="Config\XmlFileReader.cs" />
+    <Compile Include="Data\DbModel.cs" />
     <Compile Include="Data\IDAO.cs" />
+    <Compile Include="Data\IDbModel.cs" />
     <Compile Include="Data\LogDAO.cs" />
     <Compile Include="Domain\Entity\LogDO.cs" />
     <Compile Include="Domain\Mapper\IRowMapper.cs" />
@@ -57,7 +61,9 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="app.config" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\LogTail.Common\LogTail.Common.csproj">
       <Project>{1aebd86d-cdb7-4c73-b9e8-06f851664fbc}</Project>
@@ -67,6 +73,7 @@
   <ItemGroup>
     <Content Include="Config\DBConfig.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

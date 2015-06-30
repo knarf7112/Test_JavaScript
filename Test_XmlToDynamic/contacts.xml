@@ -1,8 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <contacts>
   <contact id='1'>
-    <Qoo>test<qq>999</qq>
-  </Qoo>
+    <Qoo>
+      test<qq>999</qq>
+    </Qoo>
     <firstName>Michael</firstName>
     <lastName>Jordan</lastName>
     <age>40</age>

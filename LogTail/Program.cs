@@ -7,6 +7,10 @@ using System.Data;
 using Npgsql;
 using LogTail.Domain.Mapper;
 using LogTail.Domain.Entity;
+using LogTail.Config;
+using System.Xml.Linq;
+using System.IO;
+using System.Collections;
 
 namespace LogTail
 {
@@ -19,6 +23,25 @@ namespace LogTail
         /// <param name="args"></param>
         static void Main(string[] args)
         {
+            XmlFileReader xx = new XmlFileReader(@"Config\DBConfig.xml");
+            var dic = new Dictionary<string,object>();
+            xx.Parse(dic, xx.xEle);
+            //--------------------------------------------------------------------------
+            XDocument xDoc = XDocument.Load(new StreamReader(@"Config\DBConfig.xml"));
+            XElement xe = xDoc.Root;
+            IEnumerable<XElement> query = xe.Descendants("ConnectionString");
+            string connectionString2 = query.Where((XElement x) => 
+            {
+                return (x.Attribute("Selected").Value.ToLower() == "true");
+            }).First().Value.Trim();
+            
+            //************************************************************************
+            //Node parent = new Node();
+            //var xDoc = XDocument.Load(new StreamReader("Config/DBConfig.xml"));
+            //XmlFileReader.Parse(parent, xDoc.Elements().First());
+            //var qq2 = parent;
+            //************************************************************************
+            #region 以下為NpgSql 的資料庫連線測試與RowMapper測試
             IRowMapper<LogDO> qq = new RowMapper<LogDO>();//
             
             string connectionString = "Server=10.27.68.151;Port=5432;User Id=test;Password=test123;Database=logdb;";
@@ -32,6 +55,8 @@ namespace LogTail
             dbCmd.CommandText = sqlCmd;
             //************************************************************************
             IDataReader dr = dbCmd.ExecuteReader();
+            //dbCmd.Dispose();
+            //dbCmd = null;
             RowMapper<LogDO> list = new RowMapper<LogDO>();
             IEnumerable<LogDO> enumerable = list.AllRowMapping(dr);
             foreach (var item in enumerable)
@@ -67,6 +92,8 @@ namespace LogTail
             dbCmd = null;
             dbCon.Close();
             dbCon = null;
+            #endregion
+            //****************************************************************************
             Console.ReadKey();
         }
     }

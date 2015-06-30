@@ -3,20 +3,39 @@ using LogTail.Domain.Entity;
 using System;
 using System.Data;
 using Npgsql;
+using System.Data.SqlClient;
+using System.Xml.Linq;
+using System.IO;
 
 namespace LogTail.Data
 {
     public class LogDAO : IDAO<LogDO, int>
     {
-        public string LogTable { get; set; }
-
-        private IDbConnection dbConnection;
-
-        private IDbCommand dbCommand;
+        private string _logTable;
+        public string LogTable 
+        { 
+            get 
+            {
+                if (string.IsNullOrEmpty(_logTable))
+                    throw new Exception("table name is null or empty!");
+                return this._logTable;
+            }
+            set 
+            {
+                this._logTable = value;
+            }
+        }
+        private DbModel dbModel;
 
         public LogDAO()
         {
-            dbConnection = new NpgsqlConnection();
+            
+            this.dbModel = new DbModel(new NpgsqlConnection());
+        }
+
+        public void LoadConfig()
+        {
+            
             
         }
 
