@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
+using System.Xml;
 namespace LogTail.Config
 {
     /// <summary>
@@ -13,58 +11,84 @@ namespace LogTail.Config
     {
         public string NodeName { get; set; }
 
+        public XmlNodeType Nodetype { get; set; }
+
         public string NodeValue { get; set; }
 
         public Node NextNode { set; get; }
 
-        public IDictionary<string, string> AttributeList = new Dictionary<string, string>();
+        private IDictionary<string, string> _AttributeList = new Dictionary<string, string>();
 
-        private IList<Node> SameNameNodeList = new List<Node>();
+        private IList<Node> _ChildNodeList = new List<Node>();
+        //get Child Node
         public Node this[int index]
         {
             get
             {
-                return this.SameNameNodeList[index];
+                return this._ChildNodeList[index];
             }
             set
             {
-                if (this.SameNameNodeList[index - 1] == null)
+                if (this._ChildNodeList[index - 1] == null)
                 {
                     throw new Exception("此index(" + index + ")前一位元素為null,無法插入當前位置");
                 }
-                if (this.SameNameNodeList[index] == null)
+                if (this._ChildNodeList[index] == null)
                 {
                     //因為IList無法用list[index] = value的方式
-                    this.SameNameNodeList.Add(value);
+                    this._ChildNodeList.Add(value);
                 }
                 else
                 {
-                    this.SameNameNodeList[index] = value;
+                    this._ChildNodeList[index] = value;
                 }
             }
         }
         //get Attribute
-        public string this[int index,string key]{
+        public string this[string key]{
             get
             {
-                if (this.SameNameNodeList[index] != null && this.SameNameNodeList[index].AttributeList.ContainsKey(key))
-                    return this.SameNameNodeList[index].AttributeList[key];
+                if (this._AttributeList.ContainsKey(key))
+                    return this._AttributeList[key];
                 else
-                {
-                    return string.Empty;
-                }
+                    return null;
             }
             set
             {
-                this.SameNameNodeList[index].AttributeList[key] = value;
+                //this._AttributeList.Add(key, value);
+                this._AttributeList[key] = value;
             }
         }
 
-        public int Length
+        public IDictionary<string, string> GetAttributeDic
         {
             get
             {
-                return this.SameNameNodeList.Count;
+                return this._AttributeList;
+            }
+        }
+
+        public IList<Node> GetChildList
+        {
+            get
+            {
+                return this._ChildNodeList;
+            }
+        }
+
+        public int AttributeLength
+        {
+            get
+            {
+                return this._AttributeList.Count;
+            }
+        }
+
+        public int ChildLength
+        {
+            get
+            {
+                return this._ChildNodeList.Count;
             }
         }
     }

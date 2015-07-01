@@ -6,13 +6,16 @@ using Npgsql;
 using System.Data.SqlClient;
 using System.Xml.Linq;
 using System.IO;
+using System.Collections.Generic;
+using LogTail.Config;
+using LogTail.Domain.Mapper;
 
 namespace LogTail.Data
 {
     public class LogDAO : IDAO<LogDO, int>
     {
-        private string _logTable;
-        public string LogTable 
+        private string _logTable = string.Empty;
+        public string CurrentSelectLogTable 
         { 
             get 
             {
@@ -25,50 +28,147 @@ namespace LogTail.Data
                 this._logTable = value;
             }
         }
-        private DbModel dbModel;
 
+        public string CurrentSelectConnectionString { get; set; }
+
+        public string Error { get; set; }
+
+        //public IDictionary<string, string> ConnectionStringDic { get; set; }
+        //public IList<string> LogTableList { get; set; }
+        private DbModel dbModel { get; set; }
+        private RowMapper<LogDO> mapper { get; set; }
         public LogDAO()
         {
-            
-            this.dbModel = new DbModel(new NpgsqlConnection());
+            LoadConfig(@"Config\DBConfig.xml");
+            this.dbModel = new DbModel(new NpgsqlConnection(this.CurrentSelectConnectionString));
+            this.mapper = new RowMapper<LogDO>();
         }
 
-        public void LoadConfig()
+        private void LoadConfig(string path)
         {
-            
-            
+            XmlFileReader xml = new XmlFileReader(path);
+            this.CurrentSelectConnectionString = xml.GetNodeValue("ConnectionString", "select", "true");
+            this.CurrentSelectLogTable = xml.GetNodeAttributeValue("table", "name", "select", "true");
+
         }
 
         public int GetMaxPk()
         {
-            string getPk = @"select MAX(Id) from " + this.LogTable;
+            string getPk = @"select MAX(Id) from " + this.CurrentSelectLogTable;
 
-            //conn = new NpgsqlConnection();
-            
+
             try
             {
-
+                int result = this.dbModel.ExecScalar<int>(getPk);
+                return result;
             }
             catch (Exception ex)
             {
-
+                this.Error = ex.StackTrace;
+                return 0;
             }
-            return 0;
         }
 
-        public System.Collections.Generic.IList<LogDO> ListAfter(int pk)
+        public IList<LogDO> ListAfter(int pk)
         {
-            throw new System.NotImplementedException();
+            string cmdText = @"select 
+                                    Id, Date, Thread, Level, Logger, Message, Exception, HostId 
+                               from " + this.CurrentSelectLogTable + @" 
+                               where Id > :Id 
+                               order by Id";
+            IDataReader dr = null;
+            try
+            {
+                IDataParameter para = new NpgsqlParameter();
+                para.Direction = ParameterDirection.Input;
+                para.DbType = DbType.Int32;
+                para.ParameterName = "Id";
+                para.Value = pk;
+
+                dr = this.dbModel.ExecReader(cmdText, para);
+                return this.mapper.AllRowMapping(dr);
+            }
+            catch (Exception ex)
+            {
+                this.Error = ex.StackTrace;
+                return null;
+            }
+            finally
+            {
+                if (dr != null)
+                {
+                    dr.Close();
+                    dr.Dispose();
+                    dr = null;
+                }
+            }
         }
 
-        public System.Collections.Generic.IList<LogDO> ListByDate(string dateStr)
+        public IList<LogDO> ListByDate(string dateStr)
         {
-            throw new System.NotImplementedException();
+            string cmdText =
+                @"select 
+                    Id, Date, Thread, Level, Logger, Message, Exception, HostId
+                  from " + this.CurrentSelectLogTable + @"
+                  where to_char( Date, 'YYYYMMDD' ) = :Date 
+                  order by Id
+                 ";
+            IDataReader dr = null;
+            try
+            {
+                IDataParameter para = new NpgsqlParameter() 
+                {
+                    Direction = ParameterDirection.Input,
+                    DbType = DbType.String,
+                    ParameterName = "Date",
+                    Value = dateStr,
+                };
+                
+                
+                dr = this.dbModel.ExecReader(cmdText, para);
+                return this.mapper.AllRowMapping(dr);
+            }
+            catch (Exception ex)
+            {
+                this.Error = ex.StackTrace;
+                return null;
+            }
+            finally
+            {
+                if (dr != null)
+                {
+                    dr.Close();
+                    dr.Dispose();
+                    dr = null;
+                }
+            }
+
         }
 
         public void DeleteBefore(string dateStr)
         {
-            throw new System.NotImplementedException();
+            string cmdText =
+                @"delete 
+                  from " + this.CurrentSelectLogTable + @"
+                  where to_char( Date, 'YYYYMMDD' ) < :Date 
+                 "
+            ;
+            try
+            {
+                IDataParameter para = new NpgsqlParameter()
+                {
+                    Direction = ParameterDirection.Input,
+                    DbType = DbType.String,
+                    ParameterName = "Date",
+                    Value = dateStr,
+                };
+
+                this.dbModel.ExecNonQuery(cmdText, para);
+            }
+            catch (Exception ex)
+            {
+                this.Error = ex.StackTrace;
+            }
         }
     }
 }

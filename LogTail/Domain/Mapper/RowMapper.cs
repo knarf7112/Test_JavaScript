@@ -63,6 +63,7 @@ namespace LogTail.Domain.Mapper
                 if (poco != null)
                 {
                     list.Add(poco);
+                    //yield return poco;
                 }
             }
             while (this.HasData);

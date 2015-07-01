@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using System.Text;
 //
-using System.Xml;
 using System.Xml.Linq;
-using System.Dynamic;
 using System.IO;
 
 namespace LogTail.Config
@@ -104,7 +100,12 @@ namespace LogTail.Config
         //簡易設定
         private IDictionary<string, object> XmlDic = new Dictionary<string, object>();
         private XDocument xDoc;
-        public XElement xEle;
+        private XElement xEle;
+        //private IEnumerable<XElement> list;
+        /// <summary>
+        /// Xml檔案讀取
+        /// </summary>
+        /// <param name="filePath">ex:"Config\DBConfig.xml"</param>
         public XmlFileReader(string filePath)
         {
             //CmdManager = new Dictionary<string, string>();
@@ -113,9 +114,14 @@ namespace LogTail.Config
             //var DOC = XDocument.Load("DBConfig.xml");
             string path = AppDomain.CurrentDomain.BaseDirectory;
             this.xDoc = XDocument.Load(new StreamReader(path + filePath));
-            this.xEle = this.xDoc.Root;
+            //this.xEle = this.xDoc.Root;
         }
 
+        /// <summary>
+        /// 暫時不用
+        /// </summary>
+        /// <param name="parent"></param>
+        /// <param name="node"></param>
         public void Parse(object parent,XElement node)
         {
             if (node.HasElements)
@@ -159,15 +165,60 @@ namespace LogTail.Config
             }
         }
 
-        //public void AddProperty(object )
-        public string GetString(string key)
+        /// <summary>
+        /// Get Node Value for the Node
+        /// Condition is the node's Attribute value
+        /// </summary>
+        /// <param name="nodeName">Search's Node Name</param>
+        /// <param name="attributeName">依據Node's Attribute Name</param>
+        /// <param name="attributeValue">依據Node's Attribute Value</param>
+        /// <returns>指定Node的Value</returns>
+        public string GetNodeValue(string nodeName,string attributeName,string attributeValue)
         {
-            return (string)XmlDic[key];
+            XElement resultXele = this.xDoc.Descendants(nodeName).Where(
+                (XElement x) =>{
+                    if (x.Attribute(attributeName) != null)
+                        return x.Attribute(attributeName).Value.Trim().ToUpper() == attributeValue.ToUpper();
+                    else
+                        return false;
+                }).FirstOrDefault();//.Value.Trim();
+            if (resultXele != null)
+            {
+                return resultXele.Value.Trim();
+            }
+            else
+            {
+                return null;
+            }
+            
         }
 
-        public T GetObject<T>(string key)
+        /// <summary>
+        /// Get Attribute's Value for the Node
+        /// Condition is the node's Attribute value
+        /// </summary>
+        /// <param name="nodeName">Search's Node Name</param>
+        /// <param name="attributeName"></param>
+        /// <param name="conditionAttributeName">條件式:Node AttributeName</param>
+        /// <param name="conditionattributeValue">此Node AttributeName的Value</param>
+        /// <returns>指定Node的某個Attribute Value</returns>
+        public string GetNodeAttributeValue(string nodeName, string attributeName, string conditionAttributeName, string conditionattributeValue)
         {
-            return (T)XmlDic[key];
+            XElement resultXele = this.xDoc.Descendants(nodeName).Where(
+                (XElement x) =>{
+                    if (x.Attribute(conditionAttributeName) != null)
+                        return x.Attribute(conditionAttributeName).Value.Trim().ToUpper() == conditionattributeValue.ToUpper();
+                    else
+                        return false;
+                }).FirstOrDefault();//.Attribute(attributeName).Value.Trim();
+            if (resultXele != null && resultXele.Attribute(attributeName) != null)
+            {
+                return resultXele.Attribute(attributeName).Value.Trim();
+            }
+            else
+            {
+                return null;
+            }
         }
     }
 }

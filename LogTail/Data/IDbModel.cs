@@ -15,7 +15,7 @@ namespace LogTail.Data
         /// <param name="sqlCmd">SQL命令字串</param>
         /// <param name="paras">DbCommand要加入的Parametter</param>
         /// <returns>Db資料列變更數量</returns>
-        int ExecNonQuery(string sqlCmd, params IDbDataParameter[] paras);
+        int ExecNonQuery(string sqlCmd, params IDataParameter[] paras);
 
         /// <summary>
         /// 執行Command的ExecuteScalar
@@ -24,7 +24,7 @@ namespace LogTail.Data
         /// <param name="sqlCmd">SQL命令字串</param>
         /// <param name="paras">DbCommand要加入的Parametter</param>
         /// <returns>SQL命令運算結果</returns>
-        T ExecScalar<T>(string sqlCmd, params IDbDataParameter[] paras);
+        T ExecScalar<T>(string sqlCmd, params IDataParameter[] paras);
 
         /// <summary>
         /// 執行Command的ExecuteReader
@@ -33,6 +33,6 @@ namespace LogTail.Data
         /// <param name="sqlCmd">SQL命令字串</param>
         /// <param name="paras">DbCommand要加入的Parametter</param>
         /// <returns>DataReader(自己讀取資料列)</returns>
-        IDataReader ExecReader(string sqlCmd, params IDbDataParameter[] paras);
+        IDataReader ExecReader(string sqlCmd, params IDataParameter[] paras);
     }
 }

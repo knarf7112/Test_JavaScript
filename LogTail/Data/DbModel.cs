@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 //
 using System.Data;
-using System.Data.Common;
-using System.Data.SqlClient;
 
 namespace LogTail.Data
 {
@@ -14,10 +10,14 @@ namespace LogTail.Data
         #region Field
         private IDbConnection _dbConnection = null;
         private string _error = String.Empty;
+        private bool _CloseConnection = false;
         #endregion
 
         #region Property
         public string ConnectionString { get; set; }
+        /// <summary>
+        /// 記錄Exception的TraceStack
+        /// </summary>
         public string Error 
         { 
             get 
@@ -31,6 +31,21 @@ namespace LogTail.Data
                     OnDbModelException.Invoke(value);
                 }
                 this._error = value;
+            }
+        }
+
+        /// <summary>
+        /// 執行完命令後是否關閉連線(Default:false)
+        /// </summary>
+        public bool CloseConnection
+        {
+            get
+            {
+                return this._CloseConnection;
+            }
+            set
+            {
+                this._CloseConnection = value;
             }
         }
         #endregion
@@ -65,7 +80,7 @@ namespace LogTail.Data
         /// <param name="sqlCmd">SQL命令字串</param>
         /// <param name="paras">DbCommand要加入的Parametter</param>
         /// <returns>Db資料列變更數量</returns>
-        public int ExecNonQuery(string sqlCmd, params IDbDataParameter[] paras)
+        public int ExecNonQuery(string sqlCmd, params IDataParameter[] paras)
         {
             Open();
 
@@ -86,6 +101,10 @@ namespace LogTail.Data
                 dbCmd.Parameters.Clear();
                 dbCmd.Dispose();
                 dbCmd = null;
+                if (this.CloseConnection)
+                {
+                    this._dbConnection.Close();
+                }
             }
         }
 
@@ -96,10 +115,10 @@ namespace LogTail.Data
         /// <param name="sqlCmd">SQL命令字串</param>
         /// <param name="paras">DbCommand要加入的Parametter</param>
         /// <returns>SQL命令運算結果</returns>
-        public T ExecScalar<T>(string sqlCmd, params IDbDataParameter[] paras)
+        public T ExecScalar<T>(string sqlCmd, params IDataParameter[] paras)
         {
             Open();
-
+            
             IDbCommand dbCmd = this.GetDbCommand(sqlCmd, this._dbConnection, paras);
             object result = null;
             try
@@ -124,17 +143,22 @@ namespace LogTail.Data
                 dbCmd.Parameters.Clear();
                 dbCmd.Dispose();
                 dbCmd = null;
+                if (this.CloseConnection)
+                {
+                    this._dbConnection.Close();
+                }
             }
         }
 
         /// <summary>
         /// 執行Command的ExecuteReader
-        /// Command已Dispose
+        /// 執行完方法會Dispose Command物件
+        /// 但連線要自己手動關閉
         /// </summary>
         /// <param name="sqlCmd">SQL命令字串</param>
         /// <param name="paras">DbCommand要加入的Parametter</param>
         /// <returns>DataReader(自己讀取資料列)</returns>
-        public IDataReader ExecReader(string sqlCmd, params IDbDataParameter[] paras)
+        public IDataReader ExecReader(string sqlCmd, params IDataParameter[] paras)
         {
             Open();
 
@@ -148,6 +172,8 @@ namespace LogTail.Data
             catch (Exception ex)
             {
                 this.Error = ex.StackTrace;
+                
+                dbCmd.Cancel();
                 throw ex;
             }
             finally
@@ -157,7 +183,6 @@ namespace LogTail.Data
                 dbCmd = null;
             }
         }
-
         #endregion
 
         #region Private Method

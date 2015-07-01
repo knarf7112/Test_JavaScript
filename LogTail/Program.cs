@@ -11,6 +11,7 @@ using LogTail.Config;
 using System.Xml.Linq;
 using System.IO;
 using System.Collections;
+using System.Text.RegularExpressions;
 
 namespace LogTail
 {
@@ -23,18 +24,23 @@ namespace LogTail
         /// <param name="args"></param>
         static void Main(string[] args)
         {
+            
+
             XmlFileReader xx = new XmlFileReader(@"Config\DBConfig.xml");
-            var dic = new Dictionary<string,object>();
-            xx.Parse(dic, xx.xEle);
+            string connectionStringtest = xx.GetNodeValue("ConnectionString", "select", "true");
+            string tableName = xx.GetNodeAttributeValue("table", "name", "select", "true");
+            //var dic = new Dictionary<string,object>();
+            //xx.Parse(dic, xx.xEle);
             //--------------------------------------------------------------------------
             XDocument xDoc = XDocument.Load(new StreamReader(@"Config\DBConfig.xml"));
-            XElement xe = xDoc.Root;
-            IEnumerable<XElement> query = xe.Descendants("ConnectionString");
+            //XElement xe = xDoc.Root;
+            
+            IEnumerable<XElement> query = xDoc.Descendants("ConnectionString");
             string connectionString2 = query.Where((XElement x) => 
             {
-                return (x.Attribute("Selected").Value.ToLower() == "true");
+                return (x.Attribute("select").Value.ToLower() == "true");
             }).First().Value.Trim();
-            
+            var qq2 = query;
             //************************************************************************
             //Node parent = new Node();
             //var xDoc = XDocument.Load(new StreamReader("Config/DBConfig.xml"));
@@ -55,7 +61,15 @@ namespace LogTail
             dbCmd.CommandText = sqlCmd;
             //************************************************************************
             IDataReader dr = dbCmd.ExecuteReader();
-            //dbCmd.Dispose();
+            dbCmd.Dispose();//Command關閉不影響DataReader讀取資料,但連線關閉就不能用了,再Open連線也沒用
+            //----------------------------------------
+            //關閉連線再重開的測試
+            //dbCon.Close();
+            //dbCon.Open();
+            //dbCmd = dbCon.CreateCommand();
+            //dbCmd.CommandText = sqlCmd;
+            //dr = dbCmd.ExecuteReader();
+            //----------------------------------------
             //dbCmd = null;
             RowMapper<LogDO> list = new RowMapper<LogDO>();
             IEnumerable<LogDO> enumerable = list.AllRowMapping(dr);
