@@ -1,19 +1,20 @@
-﻿var callback = function (event) {
+﻿var callbackFunc = function (event, displayEle) {
     //console.log("callback:");
     //console.log(xhr);
     if (this.readyState == 4 )
         if (this.status == 200) {
             //XMLHttpRequest Object call back
             //console.log(this.responseText);
-            console.log("檔案傳輸完成 ...");
+            console.log("資料傳輸完成 ...");
+
         }
         else {
             console.log('There was a problem with the request.');
         }
     
 }
-
-function Ajax(method, url, sendCmd, async) {
+//method='get or post', url=ajax's page, send object,async=true or false, callback=response do method[
+function Ajax(method, url, sendCmd, async, callback) {
     var xhr;
     if (window.XMLHttpRequest){
         xhr = new XMLHttpRequest();
@@ -39,10 +40,16 @@ function Ajax(method, url, sendCmd, async) {
     //xhr.onload = function (data) {
     //    console.log(data);
     //}
+    var data = JSON.stringify(sendCmd);//"cmd=" + sendCmd ;
+
     if (method.toUpperCase() == "POST") {
-        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhr.setRequestHeader("Content-Type", "application/json; charset=utf-8");//"application/x-www-form-urlencoded");
+        xhr.send(data);
     }
-    var data = "cmd=" + sendCmd ;
-    xhr.send(data);
+    else {
+        xhr.send(sendCmd);
+    }
+    
+    
 }
 

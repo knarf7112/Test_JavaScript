@@ -100,7 +100,7 @@ namespace LogTail.Config
         //簡易設定
         private IDictionary<string, object> XmlDic = new Dictionary<string, object>();
         private XDocument xDoc;
-        private XElement xEle;
+        //private XElement xEle;
         //private IEnumerable<XElement> list;
         /// <summary>
         /// Xml檔案讀取
@@ -112,9 +112,16 @@ namespace LogTail.Config
             //TODO..............................
             //讀取Xml設定檔的方式,還沒想到要怎寫比較靈活
             //var DOC = XDocument.Load("DBConfig.xml");
-            string path = AppDomain.CurrentDomain.BaseDirectory;
-            this.xDoc = XDocument.Load(new StreamReader(path + filePath));
-            //this.xEle = this.xDoc.Root;
+            string fullPath = AppDomain.CurrentDomain.RelativeSearchPath + filePath;
+            try
+            {
+                this.xDoc = XDocument.Load(new StreamReader(fullPath));
+                //this.xEle = this.xDoc.Root;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
 
         /// <summary>

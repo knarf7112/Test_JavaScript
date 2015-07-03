@@ -112,6 +112,10 @@ namespace LogTail.Common
             return base.GetHashCode();
         }
 
+        /// <summary>
+        /// 使用Xml格式列出屬性值
+        /// </summary>
+        /// <returns></returns>
         public override string ToString()
         {
             XElement xd = this.GetXElement();
@@ -175,7 +179,7 @@ namespace LogTail.Common
 
             try
             {
-                //迴圈寫入XML物建
+                //迴圈寫入XML物件
                 foreach (PropertyInfo p in pi)
                 {
                     XElement xe = new XElement(p.Name, "");
@@ -194,7 +198,7 @@ namespace LogTail.Common
                             xe.Add(new XElement(((AbstractDO)tmpObj).GetXElement()));
                         }
                         //若屬性為陣列
-                        else if(tmpObj == typeof(byte[]))
+                        else if (tmpObj.GetType() == typeof(byte[]))
                         {
                             byte[] thisVal = (byte[])tmpObj;
                             StringBuilder sb = new StringBuilder("{");

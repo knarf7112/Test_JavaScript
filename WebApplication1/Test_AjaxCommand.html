@@ -5,18 +5,35 @@
     <script type="text/javascript" src="JS/Ajax.js"></script>
     <title></title>
     <script>
-        var url = "/CmdHandler.ashx";
+        var url = "/Test_CmdHandler.ashx";
         var button;
         window.onload = function () {
             button = document.getElementById("send");
             button.onclick = function () {
                 var text = document.getElementById("cmd").value;
                 console.log("Button click ...");
-                Ajax("POST", url, text, true);
+                var sendData = { cmd: text };
+                Ajax("POST", url, sendData, true, callback);
                 console.log("Run Ajax ...");
             }
         };
+        var callback = function (event, displayEle) {
+            //console.log("callback:");
+            //console.log(xhr);
+            if (this.readyState == 4)
+                if (this.status == 200) {
+                    //XMLHttpRequest Object call back
+                    var src = event || window.event;
+                    var xmlResponse = src.srcElement ? src.srcElement : src.target;
+                    console.log(xmlResponse.responseText);
+                    console.log("QQ傳輸完成 ...");
 
+                }
+                else {
+                    console.log('There was a problem with the request.');
+                }
+
+        }
     </script>
 </head>
 <body>

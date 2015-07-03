@@ -3,12 +3,15 @@
 using System.Web.Caching;
 using System.Web.SessionState;
 using System.Collections.Generic;
+//
+using LogTail.Business;
 
 namespace MyWebSite
 {
     public class Global : System.Web.HttpApplication
     {
-        Cache qq;
+        //Cache qq;
+        public static LogDumper logDumper { get; set; }
         /// <summary>
         /// 因為沒有Session物件,模擬Session用的字典檔
         /// </summary>
@@ -17,6 +20,9 @@ namespace MyWebSite
         {
             //被IIS執行起動的第一次進入點
             _MySession = new Dictionary<string, object>();
+            //好像沒用
+            this.Error += Global_Error;
+            logDumper = new LogDumper();
             //qq = new Cache(); 
             //Test_JavaScript.App_Code.TestRun tt = new App_Code.TestRun(){Name = "Qoo", Age = 18, IsRun = true};
             //qq.Add("test", tt, new CacheDependency(""), DateTime.Now, new TimeSpan(0, 0, 20), CacheItemPriority.Default, new CacheItemRemovedCallback((string qq2, object obj, CacheItemRemovedReason oo) => {
@@ -24,13 +30,14 @@ namespace MyWebSite
 
             //}));
             
-            //好像沒用
-            this.Error += Global_Error;
+            
         }
 
         //
         void Global_Error(object sender, EventArgs e)
         {
+            var ss = ((Global)sender);
+
             this.Response.Write("Server端有問題:執行拋出的異常");
         }
 

@@ -1,17 +1,22 @@
-﻿using System;
+﻿#define TestDumper
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-//
+
+//Postgres test need Assembly
 using System.Data;
 using Npgsql;
 using LogTail.Domain.Mapper;
 using LogTail.Domain.Entity;
+
+//load xml file need
 using LogTail.Config;
 using System.Xml.Linq;
 using System.IO;
 using System.Collections;
-using System.Text.RegularExpressions;
+
+//
+using LogTail.Business;
 
 namespace LogTail
 {
@@ -24,8 +29,20 @@ namespace LogTail
         /// <param name="args"></param>
         static void Main(string[] args)
         {
-            
 
+#if TestDumper
+            LogDumper log = new LogDumper();
+            IList<LogDO> list = log.Operate();
+            foreach (var item in list)
+            {
+                Console.WriteLine(item.ToString());
+            }
+            //JSonConvert
+#endif
+
+#if TestXmlFileReader
+#warning 這邊會在Compiler的輸出警告的地方出現
+            //
             XmlFileReader xx = new XmlFileReader(@"Config\DBConfig.xml");
             string connectionStringtest = xx.GetNodeValue("ConnectionString", "select", "true");
             string tableName = xx.GetNodeAttributeValue("table", "name", "select", "true");
@@ -34,7 +51,7 @@ namespace LogTail
             //--------------------------------------------------------------------------
             XDocument xDoc = XDocument.Load(new StreamReader(@"Config\DBConfig.xml"));
             //XElement xe = xDoc.Root;
-            
+//#error Compiler會跳一下錯誤
             IEnumerable<XElement> query = xDoc.Descendants("ConnectionString");
             string connectionString2 = query.Where((XElement x) => 
             {
@@ -46,6 +63,9 @@ namespace LogTail
             //var xDoc = XDocument.Load(new StreamReader("Config/DBConfig.xml"));
             //XmlFileReader.Parse(parent, xDoc.Elements().First());
             //var qq2 = parent;
+#endif
+
+#if TestPostgresSQL
             //************************************************************************
             #region 以下為NpgSql 的資料庫連線測試與RowMapper測試
             IRowMapper<LogDO> qq = new RowMapper<LogDO>();//
@@ -107,6 +127,7 @@ namespace LogTail
             dbCon.Close();
             dbCon = null;
             #endregion
+#endif
             //****************************************************************************
             Console.ReadKey();
         }

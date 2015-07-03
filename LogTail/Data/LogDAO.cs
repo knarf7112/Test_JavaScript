@@ -3,9 +3,6 @@ using LogTail.Domain.Entity;
 using System;
 using System.Data;
 using Npgsql;
-using System.Data.SqlClient;
-using System.Xml.Linq;
-using System.IO;
 using System.Collections.Generic;
 using LogTail.Config;
 using LogTail.Domain.Mapper;
@@ -35,11 +32,11 @@ namespace LogTail.Data
 
         //public IDictionary<string, string> ConnectionStringDic { get; set; }
         //public IList<string> LogTableList { get; set; }
-        private DbModel dbModel { get; set; }
-        private RowMapper<LogDO> mapper { get; set; }
+        private IDbModel dbModel { get; set; }
+        private IRowMapper<LogDO> mapper { get; set; }
         public LogDAO()
         {
-            LoadConfig(@"Config\DBConfig.xml");
+            LoadConfig(@"\Config\DBConfig.xml");
             this.dbModel = new DbModel(new NpgsqlConnection(this.CurrentSelectConnectionString));
             this.mapper = new RowMapper<LogDO>();
         }
@@ -65,7 +62,8 @@ namespace LogTail.Data
             catch (Exception ex)
             {
                 this.Error = ex.StackTrace;
-                return 0;
+                //return 0;
+                throw ex;
             }
         }
 
@@ -91,7 +89,8 @@ namespace LogTail.Data
             catch (Exception ex)
             {
                 this.Error = ex.StackTrace;
-                return null;
+                //return null;
+                throw ex;
             }
             finally
             {
@@ -131,7 +130,8 @@ namespace LogTail.Data
             catch (Exception ex)
             {
                 this.Error = ex.StackTrace;
-                return null;
+                //return null;
+                throw ex;
             }
             finally
             {
@@ -168,6 +168,7 @@ namespace LogTail.Data
             catch (Exception ex)
             {
                 this.Error = ex.StackTrace;
+                throw ex;
             }
         }
     }

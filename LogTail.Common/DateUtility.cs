@@ -9,13 +9,28 @@ namespace LogTail.Common
     /// </summary>
     public class DateUtility : IDateUtility
     {
+        /// <summary>
+        /// 日期+時間
+        /// </summary>
         public readonly static String DU_DATETIME = "yyyy-MM-dd HH:mm:ss.fff";//
+        /// <summary>
+        /// 日期格式
+        /// </summary>
         public static readonly String DU_DATE = "yyyyMMdd";
         private static CultureInfo CI = CultureInfo.InvariantCulture;//setting Culture設定文化特性(各國的系統時間表示法)
 
+        /// <summary>
+        /// 日期+時間的format格式
+        /// </summary>
         public string PatternDateTime { get; set; }
+        /// <summary>
+        /// 日期format格式
+        /// </summary>
         public string PatternDate { get; set; }
 
+        /// <summary>
+        /// 日期轉換物件的Constructor
+        /// </summary>
         public DateUtility()
         {
             //log ...
@@ -32,7 +47,10 @@ namespace LogTail.Common
         {
             return dateTime.ToString(this.PatternDateTime,CI);
         }
-
+        /// <summary>
+        /// get Datetime.Now by PatternDateTime format string
+        /// </summary>
+        /// <returns></returns>
         public string GetStrNow()
         {
             return GetStrByDateTime(DateTime.Now);
@@ -47,6 +65,10 @@ namespace LogTail.Common
             return date.ToString(this.PatternDate, CI);
         }
 
+        /// <summary>
+        /// get today string by pattern format string
+        /// </summary>
+        /// <returns></returns>
         public string GetStrToday()
         {
             return GetStrByDate(DateTime.Now);
@@ -74,6 +96,13 @@ namespace LogTail.Common
             return DateTime.TryParseExact(strDateTime, this.PatternDateTime, CI, DateTimeStyles.None, out dateTime);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="strDate"></param>
+        /// <param name="diff"></param>
+        /// <param name="strDiffDate"></param>
+        /// <returns></returns>
         public bool TryGetDiffDateStr(string strDate, int diff, out string strDiffDate)
         {
             DateTime d;
@@ -87,6 +116,13 @@ namespace LogTail.Common
             return false;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="strDate"></param>
+        /// <param name="diff"></param>
+        /// <param name="strDiffDate"></param>
+        /// <returns></returns>
         public bool TryGetDiffMonthStr(string strDate, int diff, out string strDiffDate)
         {
             DateTime d;
@@ -100,6 +136,13 @@ namespace LogTail.Common
             return false;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="strDate"></param>
+        /// <param name="diff"></param>
+        /// <param name="strDiffDate"></param>
+        /// <returns></returns>
         public bool TryGetDiffYearStr(string strDate, int diff, out string strDiffDate)
         {
             DateTime d;
@@ -113,34 +156,63 @@ namespace LogTail.Common
             return false;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="strDateTime"></param>
+        /// <returns></returns>
         public bool ValidDateTimeStr(string strDateTime)
         {
             DateTime dt;
             return (this.TryGetDateTimeByStr(strDateTime, out dt));
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="strDate"></param>
+        /// <returns></returns>
         public bool ValidDateStr(string strDate)
         {
             DateTime dt;
             return (this.TryGetDateByStr(strDate, out dt));
         }
 
+        /// <summary>
+        /// 日期和時間format格式使用預設值
+        /// </summary>
         public void ResetToDefault()
         {
             this.PatternDate = DateUtility.DU_DATE;
             this.PatternDateTime = DateUtility.DU_DATETIME;
         }
 
+        /// <summary>
+        /// 取得時間差(ms)
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <returns></returns>
         public long GetTotMillisecs(DateTime start, DateTime end)
         {
             return (long)((end - start).TotalMilliseconds);
         }
 
+        /// <summary>
+        /// 取得與現在的時間差
+        /// </summary>
+        /// <param name="start"></param>
+        /// <returns></returns>
         public long GetTotMillisecsNow(DateTime start)
         {
             return this.GetTotMillisecs(start, DateTime.Now);
         }
 
+        /// <summary>
+        /// 時間是否超過現在時間,true=未超時,false=超時
+        /// </summary>
+        /// <param name="expired"></param>
+        /// <returns></returns>
         public bool TimeIsUp(DateTime expired)
         {
             return this.GetTotMillisecsNow(expired) > 0;

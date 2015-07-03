@@ -1,0 +1,69 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body{
+            text-align:center;
+            margin: 0px auto;
+            background-color:yellow;
+        }
+    </style>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <script src="JS/Ajax.js"></script>
+    <script src="JS/Timer.js"></script>
+    <title>查詢Log</title>
+    <script>
+        var url = "CmdHandler.ashx";
+        var button;
+        var responseData;
+        var sendData
+        window.onload = function () {
+            button = document.getElementById("sendCmd");
+            responseData = document.getElementById("response");
+            button.onclick = function () {
+                var text = document.getElementById("cmd").value;
+                console.log("Button click ...");
+                sendData = {
+                    cmdType: text,
+                    cmdData: -1,
+                };
+                Ajax("POST", url, sendData, true, callback);
+                console.log("Run Ajax ...");
+            }
+        };
+        var jsonData;
+        var callback = function (event) {
+            if (this.readyState == 4)
+                if (this.status == 200) {
+                    //XMLHttpRequest Object call back
+                    var src = event || window.event;
+                    var xmlResponse = src.srcElement ? src.srcElement : src.target;
+                    //console.log("this:",this);
+                    console.log("response:",xmlResponse.responseText);
+                    jsonData = JSON.parse(xmlResponse.responseText);
+                    console.log("傳輸完成 ...");
+                    display();
+                }
+                else {
+                    console.log('There was a problem with the request.');
+                }
+        }
+        var display = function () {
+            var data = "";
+            for (var i = 0; i < jsonData.length; i++) {
+                var keys = Object.keys(jsonData[i]);
+                for (var j = 0; j < keys.length; j++) {
+                    data += jsonData[i][keys[j]] + "  ";
+                }
+                data += "<p>" + data + "</p>";
+            }
+            responseData.innerHTML += data;
+        };
+    </script>
+</head>
+<body>
+    <div><h1>查詢Log</h1></div>
+    <div class="requestSection"><input type="text" id="cmd" placeholder="Command" value="GetLog" autofocus/><button id="sendCmd">查詢</button></div>
+    <div id="response"></div>
+</body>
+</html>
