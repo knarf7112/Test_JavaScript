@@ -60,7 +60,9 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="CSS\main.css" />
     <Content Include="Index.html" />
+    <Content Include="JS\LogManager.js" />
     <Content Include="Test_CmdHandler.ashx" />
     <Content Include="App_Data\Programming JavaScript Applications.pdf" />
     <Content Include="CmdHandler.ashx" />

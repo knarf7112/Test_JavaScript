@@ -49,7 +49,8 @@ namespace LogTail.Business
         public IList<LogDO> Operate(ref int lastID)
         {
             int startId = 0;
-            if (lastID == -1)
+            //若lastID低於範圍內則從最後一筆資料往前取10筆
+            if (lastID <= -1)
             {
                 int lastCnt = this.logDAO.GetMaxPk();
                 if (lastCnt >= 10)
@@ -60,6 +61,10 @@ namespace LogTail.Business
                 {
                     startId = lastCnt;
                 }
+            }
+            else
+            {
+                startId = lastID;
             }
             Console.WriteLine(startId);
 

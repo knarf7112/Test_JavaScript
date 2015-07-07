@@ -12,6 +12,9 @@ namespace MyWebSite
     {
         //Cache qq;
         public static LogDumper logDumper { get; set; }
+
+        public static ILogBatcher logBatcher { get; set; }
+
         /// <summary>
         /// 因為沒有Session物件,模擬Session用的字典檔
         /// </summary>
@@ -23,6 +26,7 @@ namespace MyWebSite
             //好像沒用
             this.Error += Global_Error;
             logDumper = new LogDumper();
+            logBatcher = new LogBatcher();
             //qq = new Cache(); 
             //Test_JavaScript.App_Code.TestRun tt = new App_Code.TestRun(){Name = "Qoo", Age = 18, IsRun = true};
             //qq.Add("test", tt, new CacheDependency(""), DateTime.Now, new TimeSpan(0, 0, 20), CacheItemPriority.Default, new CacheItemRemovedCallback((string qq2, object obj, CacheItemRemovedReason oo) => {

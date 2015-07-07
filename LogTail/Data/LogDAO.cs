@@ -41,6 +41,11 @@ namespace LogTail.Data
             this.mapper = new RowMapper<LogDO>();
         }
 
+        /// <summary>
+        /// 暫時直接取檔案某個選擇的table(未完整)
+        /// 應該要提供table列表給前端選擇
+        /// </summary>
+        /// <param name="path"></param>
         private void LoadConfig(string path)
         {
             XmlFileReader xml = new XmlFileReader(path);

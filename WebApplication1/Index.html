@@ -2,13 +2,14 @@
 <html>
 <head>
     <style>
-        body{
-            text-align:center;
+        /*body{
+            text-align:left;
             margin: 0px auto;
             background-color:yellow;
-        }
+        }*/
     </style>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link type="text/css" rel="stylesheet" href="CSS/main.css" />
     <script src="JS/Ajax.js"></script>
     <script src="JS/Timer.js"></script>
     <title>查詢Log</title>
@@ -21,43 +22,60 @@
             button = document.getElementById("sendCmd");
             responseData = document.getElementById("response");
             button.onclick = function () {
+                this.setAttribute("disabled","");
                 var text = document.getElementById("cmd").value;
+                var displayElement = document.getElementById("response");
                 console.log("Button click ...");
                 sendData = {
-                    cmdType: text,
-                    cmdData: -1,
+                    cmdType: text,//GetLogByDate
+                    cmdData: "",
+                    lastId: -1,
+                    searchDate: "20150626"
                 };
-                Ajax("POST", url, sendData, true, callback);
+                Ajax("POST", url, sendData, true, function (event) { 
+                    if(this.readyState == 4){
+                        if(this.status == 200){
+                            var responseList = callback(event);
+                            displayByTable(responseList, displayElement);
+                        }
+                        else {
+                            console.log('There was a problem with the request.');
+                        }
+                    }
+                });
                 console.log("Run Ajax ...");
             }
         };
         var jsonData;
         var callback = function (event) {
-            if (this.readyState == 4)
-                if (this.status == 200) {
-                    //XMLHttpRequest Object call back
-                    var src = event || window.event;
-                    var xmlResponse = src.srcElement ? src.srcElement : src.target;
-                    //console.log("this:",this);
-                    console.log("response:",xmlResponse.responseText);
-                    jsonData = JSON.parse(xmlResponse.responseText);
-                    console.log("傳輸完成 ...");
-                    display();
-                }
-                else {
-                    console.log('There was a problem with the request.');
-                }
-        }
-        var display = function () {
-            var data = "";
-            for (var i = 0; i < jsonData.length; i++) {
-                var keys = Object.keys(jsonData[i]);
-                for (var j = 0; j < keys.length; j++) {
-                    data += jsonData[i][keys[j]] + "  ";
-                }
-                data += "<p>" + data + "</p>";
+
+            //XMLHttpRequest Object call back
+            var src = event || window.event;
+            var xmlResponse = src.srcElement ? src.srcElement : src.target;
+            //console.log("this:",this);
+            //console.log("response:", xmlResponse.responseText);
+            try{
+                jsonData = JSON.parse(xmlResponse.responseText);
             }
-            responseData.innerHTML += data;
+            catch (e) {
+                throw new Error(e);
+            }
+            console.log("解析JsonData完成", jsonData);
+            return jsonData;
+        }
+        var displayByTable = function (jsonObj, ele) {
+            var tBody = "";
+            for (var i = 0; i < jsonObj.length; i++) {
+                var rows = "";
+                var keys = Object.keys(jsonObj[i]);
+                for (var j = 0; j < keys.length; j++) {
+                    rows += "<td>" + jsonObj[i][keys[j]] + "</td>";
+                }
+                tBody += "<tr>" + rows + "</tr>";
+            };
+            var table = "<table>" + tBody + "</table>";
+            
+            ele.innerHTML += table;
         };
     </script>
 </head>

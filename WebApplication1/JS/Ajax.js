@@ -1,20 +1,5 @@
-﻿var callbackFunc = function (event, displayEle) {
-    //console.log("callback:");
-    //console.log(xhr);
-    if (this.readyState == 4 )
-        if (this.status == 200) {
-            //XMLHttpRequest Object call back
-            //console.log(this.responseText);
-            console.log("資料傳輸完成 ...");
-
-        }
-        else {
-            console.log('There was a problem with the request.');
-        }
-    
-}
-//method='get or post', url=ajax's page, send object,async=true or false, callback=response do method[
-function Ajax(method, url, sendCmd, async, callback) {
+﻿//method='get or post', url=ajax's page, send object,async=true or false, callback=response do method[
+var Ajax = function(method, url, sendCmd, async, callback) {
     var xhr;
     if (window.XMLHttpRequest){
         xhr = new XMLHttpRequest();
