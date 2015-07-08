@@ -10,7 +10,7 @@ using System.Text;
 using System.Collections;
 using System.Text.RegularExpressions;
 
-namespace MyWebSite
+namespace LogWebService
 {
     /// <summary>
     /// CmdHandler 的摘要描述

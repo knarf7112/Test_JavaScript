@@ -10,7 +10,7 @@ using System.IO;
 using System.Dynamic;
 //using Microsoft.CSharp.RuntimeBinder;//用dynamic物件時使用
 using System.Text;
-namespace MyWebSite
+namespace LogWebService
 {
     /// <summary>
     /// CmdHandler 的摘要描述
@@ -44,9 +44,9 @@ namespace MyWebSite
             {
                 try
                 {
-                    if (!MyWebSite.Global._MySession.ContainsKey(cmd))//HttpContext.Current.Session[HttpContext.Current.Session.SessionID] == null)
+                    if (!LogWebService.Global._MySession.ContainsKey(cmd))//HttpContext.Current.Session[HttpContext.Current.Session.SessionID] == null)
                     {
-                        global::MyWebSite.Global._MySession.Add(cmd, "wrote File");
+                        global::LogWebService.Global._MySession.Add(cmd, "wrote File");
                         //HttpContext.Current.Session[HttpContext.Current.Session.SessionID] = "wrote File";//Session物件是空的
                     }
                     this.WriteFile(context);
@@ -76,9 +76,9 @@ namespace MyWebSite
                 //{
                 //    HttpContext.Current.Session[HttpContext.Current.Session.SessionID] = "wrote document";
                 //}
-                if (!MyWebSite.Global._MySession.ContainsKey(cmd))//HttpContext.Current.Session[HttpContext.Current.Session.SessionID] == null)
+                if (!LogWebService.Global._MySession.ContainsKey(cmd))//HttpContext.Current.Session[HttpContext.Current.Session.SessionID] == null)
                 {
-                    global::MyWebSite.Global._MySession.Add(cmd, "wrote document");
+                    global::LogWebService.Global._MySession.Add(cmd, "wrote document");
                     //HttpContext.Current.Session[HttpContext.Current.Session.SessionID] = "wrote File";//Session物件是空的
                 }
                 context.Response.ContentType = "text/html";

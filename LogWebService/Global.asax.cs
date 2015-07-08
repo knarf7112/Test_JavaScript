@@ -6,7 +6,7 @@ using System.Collections.Generic;
 //
 using LogTail.Business;
 
-namespace MyWebSite
+namespace LogWebService
 {
     public class Global : System.Web.HttpApplication
     {

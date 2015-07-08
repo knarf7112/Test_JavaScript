@@ -1,0 +1,1 @@
+﻿<%@ WebHandler Language="C#" CodeBehind="CmdHandler.ashx.cs" Class="LogWebService.CmdHandler" %>

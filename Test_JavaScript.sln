@@ -5,7 +5,7 @@ VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test_JavaScript", "Test_JavaScript\Test_JavaScript.csproj", "{0A360965-E44F-4ADB-B6B5-5C5DABCE7088}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyWebSite", "WebApplication1\MyWebSite.csproj", "{80AB46A6-D612-43EF-AC9B-3DA485B39313}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogWebService", "LogWebService\LogWebService.csproj", "{80AB46A6-D612-43EF-AC9B-3DA485B39313}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogTail.Common", "LogTail.Common\LogTail.Common.csproj", "{1AEBD86D-CDB7-4C73-B9E8-06F851664FBC}"
 EndProject
