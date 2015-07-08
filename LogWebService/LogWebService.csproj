@@ -63,6 +63,8 @@
     <Content Include="CSS\main.css" />
     <Content Include="Index.html" />
     <Content Include="JS\LogManager.js" />
+    <Content Include="JS\TableManager.js" />
+    <Content Include="TableTest.html" />
     <Content Include="Test_CmdHandler.ashx" />
     <Content Include="App_Data\Programming JavaScript Applications.pdf" />
     <Content Include="CmdHandler.ashx" />
