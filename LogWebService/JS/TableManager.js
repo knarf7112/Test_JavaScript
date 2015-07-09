@@ -11,6 +11,8 @@ TableManager.Create = function () {
 }
 
 TableManager.Create.prototype = {
+    //建立新table元素,使用DOMParser
+    //rows=表格列數量,column=表格欄數量,tableId=設定table的id屬性名稱,tbClassName=所有欄位的class屬性名稱
     createTable: function (rows, columns, tableId, tdClassName) {
         //elements
         var className = !!tdClassName ? ( ' class="' + tdClassName + '"') : "";
@@ -48,6 +50,8 @@ TableManager.Create.prototype = {
 
         return element;
     },
+    //插入資料到表格元素
+    //dataObj=資料陣列(裡面元素為{xxx:'xx'}),dataStartIndex=設定讀取的資料起始位置,tableElement=要改變資料的table元素
     insertData: function (dataObj, dataStartIndex, tableElement) {
         var keys = Object.getOwnPropertyNames(dataObj[0]);
         var trElements = tableElement.querySelectorAll('tr');
@@ -60,11 +64,10 @@ TableManager.Create.prototype = {
                 }
                     //tr
                 else {
-                    //-------TODO...................................
-                    
-                    if ((i + dataStartIndex) < dataObj.length) {
-                        console.log(('dataObj[' + (i + dataStartIndex) + '][' + keys[j] + ']'), dataObj[i + dataStartIndex][keys[j]]);
-                        trElements[i].children[j].textContent = dataObj[i + dataStartIndex][keys[j]];
+                    //check data length if not overflow 
+                    if ((i + dataStartIndex - 1) < dataObj.length) {
+                        console.log(('dataObj[' + (i + dataStartIndex - 1) + '][' + keys[j] + ']'), dataObj[i + dataStartIndex - 1][keys[j]]);
+                        trElements[i].children[j].textContent = dataObj[i + dataStartIndex - 1][keys[j]];
                     }
                     else {
                         trElements[i].children[j].textContent = '';
@@ -72,8 +75,20 @@ TableManager.Create.prototype = {
                 }
             }
         }
-        
-
+    },
+    //顯示資料
+    //element=要插入的元素, parentElement=要展示的父元素, insertBefore=插入在父元素裡面的前面(true)或後面(false)
+    display: function (element, parentElement, insertBefore) {
+        if (!(parentElement instanceof HTMLElement) || !(element instanceof HTMLElement)) {
+            console.log('parameter is not a HTMLElement!!!', element, parentElement);
+            return;
+        };
+        if (!insertBefore) {
+                parentElement.appendChild(element);
+        }
+        else {
+            parentElement.insertBefore(element, parentElement.firstChild); 
+        }
     },
 };
 

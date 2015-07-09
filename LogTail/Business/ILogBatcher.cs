@@ -11,6 +11,9 @@ namespace LogTail.Business
         /// </summary>
         /// <returns></returns>
         IList<LogDO> Operate();
+
+        IList<LogDO> Operate(string dateStr);
+
         void Delete();
     }
 }

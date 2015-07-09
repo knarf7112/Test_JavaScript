@@ -108,6 +108,11 @@ namespace LogTail.Data
             }
         }
 
+        /// <summary>
+        /// 依據查詢時間列表Log物件
+        /// </summary>
+        /// <param name="dateStr"></param>
+        /// <returns></returns>
         public IList<LogDO> ListByDate(string dateStr)
         {
             string cmdText =

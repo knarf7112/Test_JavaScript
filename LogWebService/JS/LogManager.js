@@ -59,7 +59,7 @@ LogManager.Data.prototype = {
         return resultObj;
     },
 
-    display
+    //display
 };
 //**********************************************************
 

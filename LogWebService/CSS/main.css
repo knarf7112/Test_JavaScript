@@ -9,6 +9,12 @@ table, th, td{
 }
 
 th, td{
+    border-collapse:collapse;
+    width: 100px;
+    height: 100px;
+    overflow:hidden;
+    word-wrap:break-word;
+    /*text-wrap:avoid;*/
     padding: 5px;
     text-align: left;
 }

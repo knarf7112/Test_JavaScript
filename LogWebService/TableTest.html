@@ -2,20 +2,43 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <title>Table測試</title>
+    <title>TableManager測試</title>
     <style>
-        table, th, td{
-            max-width: 600px;
-            max-height: 300px;
+        body {
+            max-width: 1900px;
+            max-height: 1200px;
             margin: 0px auto;
             border:1px solid blue;
+            background-color:aqua;
+        }
+        table{
+            margin: 0px auto;
+            border-collapse: collapse;
+            border:1px solid blue;
+        }
+        th, td {
+            border:1px solid blue;
+            width: 200px;
+            height: 50px;
+            overflow: hidden;
+            word-wrap: break-word;
+            /*text-wrap:avoid;*/
+            padding: 5px;
+            text-align: left;
         }
     </style>
-    <script>
-    </script>
+    <script type="text/javascript" src="JS/TableManager.js" async></script>
 </head>
 <body>
+    <h1>此頁用來測試TableManager模組</h1>
     <div>
+        <button id="startInsert">開始插入資料</button>
+    </div>
+    <div>
+        <button id="startCreate">開始新增table並插入資料後顯示</button>
+        <input id="insertBefore" type="checkbox" />插入在前面
+    </div>
+    <div id="testSection">
         <table id="tb1">
             <tr>
                 <th>測試標題1</th>
@@ -24,7 +47,9 @@
             </tr>
             <tr>
                 <td>一之一</td>
-                <td colspan="2">一之二</td>
+                <!--<td colspan="2">一之二</td>-->
+                <td>一之二</td>
+                <td>一之三</td>
             </tr>
             <tr>
                 <td>二之一</td>
@@ -53,5 +78,33 @@
             </tr>
         </table>
     </div>
+    <script>
+        var data = [
+            {帳號:'1-1',密碼:'123',姓名:'Test1'},{帳號:'2-1',密碼:'456',姓名:'Test2'},
+            {帳號:'3-1',密碼:'789',姓名:'Test3'},{帳號:'4-1',密碼:'987',姓名:'Test4'},
+            {帳號:'5-1',密碼:'654',姓名:'Test5'},{帳號:'6-1',密碼:'321',姓名:'Test6'}];
+        var tb = document.getElementById('tb1');
+        var parentDiv = document.getElementById('testSection');
+        var insertCheck = document.getElementById('insertBefore');
+        var startBtn = document.getElementById('startInsert');
+        startBtn.onclick = function () {
+            console.log('開始執行插入資料到table');
+            var tbCreater = new TableManager.Create();
+            tbCreater.insertData(data, 3, tb);
+        };
+        //*************************************************************
+        var startBtn2 = document.getElementById('startCreate');
+        startBtn2.onclick = function () {
+            console.log('開始執行新增table');
+            var tbCreater = new TableManager.Create();
+            var eleTable = tbCreater.createTable(6, 3, 'tb1', 'td1');
+            console.log('開始執行插入資料到table');
+            tbCreater.insertData(data, 2, eleTable);
+            console.log('開始Display table');
+            var insertBefore = insertCheck.checked;
+            tbCreater.display(eleTable, parentDiv, insertBefore);
+            //document.body.appendChild(eleTable);
+        };
+    </script>
 </body>
 </html>
