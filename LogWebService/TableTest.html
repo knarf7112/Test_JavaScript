@@ -89,14 +89,14 @@
         var startBtn = document.getElementById('startInsert');
         startBtn.onclick = function () {
             console.log('開始執行插入資料到table');
-            var tbCreater = new TableManager.Create();
+            var tbCreater = new TableManager();
             tbCreater.insertData(data, 3, tb);
         };
         //*************************************************************
         var startBtn2 = document.getElementById('startCreate');
         startBtn2.onclick = function () {
             console.log('開始執行新增table');
-            var tbCreater = new TableManager.Create();
+            var tbCreater = new TableManager();
             var eleTable = tbCreater.createTable(6, 3, 'tb1', 'td1');
             console.log('開始執行插入資料到table');
             tbCreater.insertData(data, 2, eleTable);

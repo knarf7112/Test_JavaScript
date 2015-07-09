@@ -82,6 +82,20 @@
 </head>
 <body>
     <div><h1>查詢Log</h1></div>
+    <div>
+        <b>選擇要看的紀錄表(目前沒用)</b>
+        <select id="tableName">
+            <option value="alollog">對POS端服務紀錄</option>
+            <option value="alcenterlog" selected="selected">對中心端AP服務紀錄</option>
+            <option value="bankagent0008log">對華南銀端服務紀錄</option>
+            <option value="bankagent0822log">對中信銀端服務紀錄</option>
+            <option value="bankagent0808log">對玉山銀端服務紀錄</option>
+            <option value="bankagent0814log">對大眾銀端服務紀錄</option>
+            <option value="bankagent0007log">對第一銀端服務紀錄</option>
+            <option value="bankagent0806log">對元大銀端服務紀錄</option>
+            <option value="bankagent0012log">對富邦銀端服務紀錄</option>
+        </select>
+    </div>
     <div class="requestSection"><input type="text" id="cmd" placeholder="Command" value="GetLog" autofocus/><button id="sendCmd">查詢</button></div>
     <div id="response"></div>
 </body>

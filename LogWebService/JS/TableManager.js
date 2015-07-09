@@ -1,17 +1,17 @@
 ﻿//目標功能
 //1.建立table框架(即空殼DOM in memory)
 //2.使用框架(DOM插入或替換資料)
-var TableManager = {
-    'Version': '00'
-}
+//var TableManager = {
+//    'Version': '00'
+//}
 //**********************************************
 //建立 table 框架 rows=>tr count, columns=>td count
-TableManager.Create = function () {
+var TableManager = function () {
     
 }
 
-TableManager.Create.prototype = {
-    //建立新table元素,使用DOMParser
+TableManager.prototype = {
+    //建立並回傳新table元素,使用DOMParser
     //rows=表格列數量,column=表格欄數量,tableId=設定table的id屬性名稱,tbClassName=所有欄位的class屬性名稱
     createTable: function (rows, columns, tableId, tdClassName) {
         //elements
@@ -76,8 +76,8 @@ TableManager.Create.prototype = {
             }
         }
     },
-    //顯示資料
-    //element=要插入的元素, parentElement=要展示的父元素, insertBefore=插入在父元素裡面的前面(true)或後面(false)
+    //展現資料
+    //element=要插入的資料元素, parentElement=要展示資料的父元素, insertBefore=插入在父元素裡面的前面(true)或後面(false)
     display: function (element, parentElement, insertBefore) {
         if (!(parentElement instanceof HTMLElement) || !(element instanceof HTMLElement)) {
             console.log('parameter is not a HTMLElement!!!', element, parentElement);
@@ -93,8 +93,6 @@ TableManager.Create.prototype = {
 };
 
 //**********************************************
-TableManager.Insert = function () {
 
-}
 
 

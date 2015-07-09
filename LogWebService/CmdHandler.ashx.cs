@@ -56,7 +56,7 @@ namespace LogWebService
                 return;
             }
             #endregion
-
+            
             if (!string.IsNullOrEmpty(cmdObj.cmdType))
             {
                 IList<LogDO> logList = GetDataByCmd(cmdObj);
