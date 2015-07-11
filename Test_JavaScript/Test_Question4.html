@@ -1,0 +1,34 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <script type="text/javascript" src="JS/Question4.js"></script>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta http-equiv="Cache-Control" content="no-cache" />
+    <title>Test Question 4</title>
+</head>
+<body>
+    <div>
+        <p><b>Problem 4</b></p>
+        <p>Write a function that given a list of non negative integers, </p>
+        <p>arranges them such that they form the largest possible number. </p>
+        <p>For example, given [50, 2, 1, 9], the largest formed number is 95021.</p>
+        <p>
+            Update: Apparently this problem got a lot of people talking <br>
+            (although not as much as Problem 5 below.)
+        </p>
+     </div>
+     <div>
+        要取最大值的陣列:<b>[53, 50, 51, 2, 1, 9]</b>
+     </div>
+        <div id='Ans'></div>
+    <script>
+        //var arr = [120, 9, 1, 20, 5, 13];
+        var arr = [53, 50, 51, 2, 1, 9];
+        //sort(arr);
+        //document.getElementById('Ans').textContent = "比較結果:<b>" + sort(arr).join('').toString() + "</b>";
+        document.getElementById('Ans').innerHTML = "比較結果:<b>" + sort(arr).join('').toString() + "</b>";
+
+    </script>
+
+</body>
+</html>

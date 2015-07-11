@@ -71,8 +71,10 @@
     <Content Include="App_Data\TestIcon_16x16.ico" />
     <Content Include="JS\Ajax.js" />
     <Content Include="JS\Permutation.js" />
+    <Content Include="JS\Question4.js" />
     <Content Include="JS\Question5.js" />
     <Content Include="Test_Permutation.html" />
+    <Content Include="Test_Question4.html" />
     <Content Include="Test_Question5.html" />
     <Content Include="Test_quote.html" />
     <Content Include="Web.config">
