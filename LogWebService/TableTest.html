@@ -128,7 +128,7 @@
 
         var horizontalDiv = document.getElementsByClassName('horizontal');
         for (var i = 0; i < horizontalDiv.length; i++) {
-            horizontalDiv[0].addEventListener('mousedown', function (event) {
+            horizontalDiv[i].addEventListener('mousedown', function (event) {
                 console.log(this,event);
             }, false);
         }
