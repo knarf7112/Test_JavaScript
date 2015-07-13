@@ -27,10 +27,10 @@
                 var displayElement = document.getElementById("response");
                 console.log("Button click ...");
                 sendData = {
-                    cmdType: text,//GetLogByDate
+                    cmdType: text,//"GetLogByDate"
                     cmdData: "",
                     lastId: -1,
-                    searchDate: "20150626"
+                    searchDate: "20150709"
                 };
                 Ajax("POST", url, sendData, true, function (event) { 
                     if(this.readyState == 4){

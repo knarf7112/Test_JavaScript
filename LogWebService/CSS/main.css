@@ -18,3 +18,11 @@ th, td{
     padding: 5px;
     text-align: left;
 }
+
+.verticle{
+    border: 1px solid blue;
+}
+
+.horizontal{
+    border: 1px solid blue;
+}

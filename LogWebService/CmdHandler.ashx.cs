@@ -35,21 +35,30 @@ namespace LogWebService
                     }
                     catch (Exception ex)
                     {
-                        context.Response.Write("<h1>前端傳來的命令物件錯誤!</h1>");
+                        context.Response.Write("<h1>前端傳來的命令物件錯誤!</h1>" + ex.StackTrace);
+                        context.Response.End();
                     }
 
                 }
             }
             else if (context.Request.HttpMethod.ToUpper() == "GET")
             {
-                cmdObj = new CmdObject()
+                try
                 {
-                    cmdType = context.Request.QueryString["cmdType"] != null ? context.Request.QueryString["cmdType"].ToString() : "",
-                    cmdData = context.Request.QueryString["cmdData"] != null ? context.Request.QueryString["cmdData"].ToString() : "",
-                    lastId = context.Request.QueryString["lastId"] != null ? Convert.ToInt32(context.Request.QueryString["lastId"]) : -1,
-                    searchDate = context.Request.QueryString["searchDate"] != null ? context.Request.QueryString["searchDate"].ToString() : ""
-                };
-                
+                    cmdObj = new CmdObject()
+                    {
+                        cmdType = context.Request.QueryString["cmdType"] != null ? context.Request.QueryString["cmdType"].ToString() : "",
+                        cmdData = context.Request.QueryString["cmdData"] != null ? context.Request.QueryString["cmdData"].ToString() : "",
+                        lastId = context.Request.QueryString["lastId"] != null ? Convert.ToInt32(context.Request.QueryString["lastId"]) : -1,
+                        searchDate = context.Request.QueryString["searchDate"] != null ? context.Request.QueryString["searchDate"].ToString() : ""
+                    };
+                    Console.WriteLine("使用者IP:" + context.Request.UserHostAddress);
+                }
+                catch (Exception ex)
+                {
+                    context.Response.Write("<h1>前端傳來的命令物件錯誤!</h1>" + ex.StackTrace);
+                    context.Response.End();
+                }
             }
             else
             {
@@ -59,8 +68,8 @@ namespace LogWebService
             
             if (!string.IsNullOrEmpty(cmdObj.cmdType))
             {
-                IList<LogDO> logList = GetDataByCmd(cmdObj);
-                WriteResponseByPartial<LogDO>(context, logList);
+                IList<LogDO> logList = GetDataByCmd(cmdObj);//get log data
+                WriteResponseByPartial<LogDO>(context, logList);//, true);//response out 
             }
         }
 
@@ -71,66 +80,127 @@ namespace LogWebService
         /// <returns>log紀錄列表</returns>
         private IList<LogDO> GetDataByCmd(CmdObject obj)
         {
-            if (obj.cmdType == "GetLog")
+            switch (obj.cmdType)
             {
-                #region 依據起始Id取得起始Id之後的Log紀錄
-                int lastId = -1;
-                if (obj.lastId >= -1)
-                {
-                    lastId = obj.lastId;
-                    IList<LogDO> logList = Global.logDumper.Operate(ref lastId);
-                    return logList;
-                    #region (舊的)寫在裡面測試用
-                    //IList<LogDO> resultList = null;
-                    //int startItem = 0;
-                    //int getListCount = 20;
-                    //context.Response.AppendHeader("Content-Type", "application/json; charset=utf-8");//沒設定charset到前端Run此頁轉碼時中文會變亂碼
-                    ////response loop a part
-                    //while (startItem < logList.Count)
-                    //{
-                    //    resultList = logList.Skip(startItem).Take(getListCount).ToList();
-                    //    startItem += getListCount;
-                    //    string logListJsonString = JsonConvert.SerializeObject(resultList);
-                    //    //string filterString = logListJsonString.Replace("\\", "");
+                case "GetLog":
+                    {
+                        #region 依據起始Id取得起始Id之後的Log紀錄
+                        int lastId = -1;
+                        if (obj.lastId >= -1)
+                        {
+                            lastId = obj.lastId;
+                            IList<LogDO> logList = Global.logDumper.Operate(ref lastId);
+                            return logList;
+                            #region (舊的)寫在裡面測試用
+                            //IList<LogDO> resultList = null;
+                            //int startItem = 0;
+                            //int getListCount = 20;
+                            //context.Response.AppendHeader("Content-Type", "application/json; charset=utf-8");//沒設定charset到前端Run此頁轉碼時中文會變亂碼
+                            ////response loop a part
+                            //while (startItem < logList.Count)
+                            //{
+                            //    resultList = logList.Skip(startItem).Take(getListCount).ToList();
+                            //    startItem += getListCount;
+                            //    string logListJsonString = JsonConvert.SerializeObject(resultList);
+                            //    //string filterString = logListJsonString.Replace("\\", "");
 
-                    //    //var i = context.Response.OutputStream.WriteTimeout;//這個資料流不支援逾時。
-                    //    try
-                    //    {
-                    //        //byte[] responseBytes = Encoding.GetEncoding(950).GetBytes(logListJsonString);//使用"Big5"編碼中文就不會亂碼了(IE only)
-                    //        byte[] responseBytes = Encoding.UTF8.GetBytes(logListJsonString);
-                    //        context.Response.OutputStream.Write(responseBytes, 0, responseBytes.Length);
-                    //        //context.Response.Write("國字測試:會亂碼嗎?" + logListJsonString);
-                    //        //context.Response.OutputStream.Flush();//看不出來有推送前台,但是確定傳超過45mb的資料量也不會crash
-                    //        context.Response.Flush();//強制將資料推送出去
-                    //    }
-                    //    catch (Exception ex)
-                    //    {
-                    //        context.Response.Write("<h1>資料流推送錯誤!" + ex.StackTrace + "</h1>");
-                    //        return;
-                    //    }
-                    //}
-                    #endregion
-                }
-                //else
-                //{
-                //    //轉換失敗,前端傳來的cmdData有問題
-                //    //Error log 之後再補...
-                //}
-                #endregion
+                            //    //var i = context.Response.OutputStream.WriteTimeout;//這個資料流不支援逾時。
+                            //    try
+                            //    {
+                            //        //byte[] responseBytes = Encoding.GetEncoding(950).GetBytes(logListJsonString);//使用"Big5"編碼中文就不會亂碼了(IE only)
+                            //        byte[] responseBytes = Encoding.UTF8.GetBytes(logListJsonString);
+                            //        context.Response.OutputStream.Write(responseBytes, 0, responseBytes.Length);
+                            //        //context.Response.Write("國字測試:會亂碼嗎?" + logListJsonString);
+                            //        //context.Response.OutputStream.Flush();//看不出來有推送前台,但是確定傳超過45mb的資料量也不會crash
+                            //        context.Response.Flush();//強制將資料推送出去
+                            //    }
+                            //    catch (Exception ex)
+                            //    {
+                            //        context.Response.Write("<h1>資料流推送錯誤!" + ex.StackTrace + "</h1>");
+                            //        return;
+                            //    }
+                            //}
+                            #endregion
+                        }
+                        return default(IList<LogDO>);
+                        #endregion
+                    }
+                case "GetLogByDate":
+                    {
+                        #region 依據日期取得此日期的Log紀錄
+                        IList<LogDO> logList = Global.logBatcher.Operate(obj.searchDate);
+                        return logList;
+                        #endregion
+                    }
+                case "GetBankStatus":
+                    {
+                        return default(IList<LogDO>);
+                    }
+                default:
+                    return default(IList<LogDO>);
             }
-            else if (obj.cmdType == "GetLogByDate")
-            {
-                #region 依據日期取得此日期的Log紀錄
-                IList<LogDO> logList = Global.logBatcher.Operate(obj.searchDate);
-                return logList;
-                #endregion
-            }
-            else if (obj.cmdType == "GetBankStatus")
-            {
-                //TODO...
-                return default(IList<LogDO>);
-            }
-            return default(IList<LogDO>);
+            #region old-2015-07-13
+            //if (obj.cmdType == "GetLog")
+            //{
+            //    #region 依據起始Id取得起始Id之後的Log紀錄
+            //    int lastId = -1;
+            //    if (obj.lastId >= -1)
+            //    {
+            //        lastId = obj.lastId;
+            //        IList<LogDO> logList = Global.logDumper.Operate(ref lastId);
+            //        return logList;
+            //        #region (舊的)寫在裡面測試用
+            //        //IList<LogDO> resultList = null;
+            //        //int startItem = 0;
+            //        //int getListCount = 20;
+            //        //context.Response.AppendHeader("Content-Type", "application/json; charset=utf-8");//沒設定charset到前端Run此頁轉碼時中文會變亂碼
+            //        ////response loop a part
+            //        //while (startItem < logList.Count)
+            //        //{
+            //        //    resultList = logList.Skip(startItem).Take(getListCount).ToList();
+            //        //    startItem += getListCount;
+            //        //    string logListJsonString = JsonConvert.SerializeObject(resultList);
+            //        //    //string filterString = logListJsonString.Replace("\\", "");
+
+            //        //    //var i = context.Response.OutputStream.WriteTimeout;//這個資料流不支援逾時。
+            //        //    try
+            //        //    {
+            //        //        //byte[] responseBytes = Encoding.GetEncoding(950).GetBytes(logListJsonString);//使用"Big5"編碼中文就不會亂碼了(IE only)
+            //        //        byte[] responseBytes = Encoding.UTF8.GetBytes(logListJsonString);
+            //        //        context.Response.OutputStream.Write(responseBytes, 0, responseBytes.Length);
+            //        //        //context.Response.Write("國字測試:會亂碼嗎?" + logListJsonString);
+            //        //        //context.Response.OutputStream.Flush();//看不出來有推送前台,但是確定傳超過45mb的資料量也不會crash
+            //        //        context.Response.Flush();//強制將資料推送出去
+            //        //    }
+            //        //    catch (Exception ex)
+            //        //    {
+            //        //        context.Response.Write("<h1>資料流推送錯誤!" + ex.StackTrace + "</h1>");
+            //        //        return;
+            //        //    }
+            //        //}
+            //        #endregion
+            //    }
+            //    //else
+            //    //{
+            //    //    //轉換失敗,前端傳來的cmdData有問題
+            //    //    //Error log 之後再補...
+            //    //}
+            //    #endregion
+            //}
+            //else if (obj.cmdType == "GetLogByDate")
+            //{
+            //    #region 依據日期取得此日期的Log紀錄
+            //    IList<LogDO> logList = Global.logBatcher.Operate(obj.searchDate);
+            //    return logList;
+            //    #endregion
+            //}
+            //else if (obj.cmdType == "GetBankStatus")
+            //{
+            //    //TODO...
+            //    return default(IList<LogDO>);
+            //}
+            //return default(IList<LogDO>);
+            #endregion
         }
 
         /// <summary>
@@ -140,15 +210,35 @@ namespace LogWebService
         /// <param name="context">HttpContext</param>
         /// <param name="logList">資料列表</param>
         /// <param name="partListCount">每次要推送的筆數</param>
-        private void WriteResponseByPartial<T>(HttpContext context,IList<T> logList,int partListCount = 20)
+        /// <param name="writeFile">是否下載JSON檔</param>
+        private void WriteResponseByPartial<T>(HttpContext context, IList<T> logList, bool writeFile = false, int partListCount = 20)
         {
             IList<T> resultList = null;
             int startItem = 0;
             int getListCount = partListCount;
-            context.Response.AppendHeader("Content-Type", "application/json; charset=utf-8");//沒設定charset到前端Run此頁轉碼時中文會變亂碼
+            context.Response.Clear();
+            //context.Response.AppendHeader("Content-Type", "application/json; charset=utf-8");//沒設定charset到前端Run此頁轉碼時中文會變亂碼
+            context.Response.ContentType = "application/json; charset=utf-8";
+
+            if(writeFile)
+            {
+                context.Response.ContentType = "application/octet-straem";
+                //檔案形式輸出 file name 目前固定名稱
+                context.Response.AddHeader("Content-Disposition", "attachment;filename=LogDetail.json");
+                
+                //要傳的資料轉JSON字串,這部份有點浪費時間轉換,只為了取total size
+                string jsonString = JsonConvert.SerializeObject(logList);
+                //JSON字串轉Byte Array
+                byte[] jsonFileSize = Encoding.UTF8.GetBytes(jsonString);
+                //設定檔案(Byte Array)大小
+                context.Response.AddHeader("Content-Length", jsonFileSize.Length.ToString());//set the download file size talk to user file total size
+                //PS:如果Server傳的檔案超過此設定大小會被丟掉
+            }
+
             //response loop a part 使用部分資料推送方式
             while (startItem < logList.Count)
             {
+                //每次推送20筆資料
                 resultList = logList.Skip(startItem).Take(getListCount).ToList();
                 startItem += getListCount;
                 string logListJsonString = JsonConvert.SerializeObject(resultList);
@@ -160,16 +250,18 @@ namespace LogWebService
                     //byte[] responseBytes = Encoding.GetEncoding(950).GetBytes(logListJsonString);//使用"Big5"編碼中文就不會亂碼了(IE only)
                     byte[] responseBytes = Encoding.UTF8.GetBytes(logListJsonString);
                     context.Response.OutputStream.Write(responseBytes, 0, responseBytes.Length);
-                    //context.Response.Write("國字測試:會亂碼嗎?" + logListJsonString);
-                    //context.Response.OutputStream.Flush();//看不出來有推送前台,但是確定傳超過45mb的資料量也不會crash
+                    //context.Response.Write("國字測試:會亂碼嗎?" + logListJsonString);//用Write方法不會亂碼,應該是使用預設的Encoding
+                    //context.Response.OutputStream.Flush();//看不出來有推送到前台,但是確定傳超過45mb的資料量也不會crash
                     context.Response.Flush();//強制將資料推送出去
                 }
                 catch (Exception ex)
                 {
-                    context.Response.Write("<h1>資料流推送錯誤!" + ex.StackTrace + "</h1>");
+                    context.Response.Write("<h1>資料流推送異常!</h1>" + "<p>" + ex.StackTrace + "</p>");
+                    context.Response.End();
                     return;
                 }
             }
+            context.Response.End();
         }
 
         public bool IsReusable

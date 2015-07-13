@@ -14,10 +14,10 @@
         table{
             margin: 0px auto;
             border-collapse: collapse;
-            border:1px solid blue;
+            /*border:1px solid blue;*/
         }
         th, td {
-            border:1px solid blue;
+            /*border:1px solid blue;*/
             width: 200px;
             height: 50px;
             overflow: hidden;
@@ -25,6 +25,19 @@
             /*text-wrap:avoid;*/
             padding: 5px;
             text-align: left;
+        }
+
+        .horizontal{
+            margin-right: -5px;
+            border:1px solid red;
+            cursor:col-resize;
+            float:right;
+            min-height:100%;
+        }
+        .verticle{
+            border:1px solid yellow;
+            cursor:row-resize;
+            max-height:1px;
         }
     </style>
     <script type="text/javascript" src="JS/TableManager.js" async></script>
@@ -41,41 +54,48 @@
     <div id="testSection">
         <table id="tb1">
             <tr>
-                <th>測試標題1</th>
-                <th>測試標題2</th>
-                <th>測試標題3</th>
+                <th>測試標題1<div class="horizontal"></div></th>
+                <th>測試標題2<div class="horizontal"></div></th>
+                <th>測試標題3<div class="horizontal"></div></th>
             </tr>
+            <tr><td colspan="3" style="height:1px;"><div class="verticle"></div></td></tr>
             <tr>
-                <td>一之一</td>
+                <td>一之一<div class="horizontal"></div></td>
                 <!--<td colspan="2">一之二</td>-->
-                <td>一之二</td>
-                <td>一之三</td>
+                <td>一之二<div class="horizontal"></div></td>
+                <td>一之三<div class="horizontal"></div></td>
             </tr>
+            <tr><td colspan="3" style="height:1px;"><div class="verticle"></div></td></tr>
             <tr>
-                <td>二之一</td>
-                <td>二之二</td>
-                <td>二之三</td>
+                <td>二之一<div class="horizontal"></div></td>
+                <td>二之二<div class="horizontal"></div></td>
+                <td>二之三<div class="horizontal"></div></td>
             </tr>
+            <tr><td colspan="3" style="height:1px;"><div class="verticle"></div></td></tr>
             <tr>
-                <td>三之一</td>
-                <td>三之二</td>
-                <td>三之三</td>
+                <td>三之一<div class="horizontal"></div></td>
+                <td>三之二<div class="horizontal"></div></td>
+                <td>三之三<div class="horizontal"></div></td>
             </tr>
+            <tr><td colspan="3" style="height:1px;"><div class="verticle"></div></td></tr>
             <tr>
-                <td>四之一</td>
-                <td>四之二</td>
-                <td>四之三</td>
+                <td>四之一<div class="horizontal"></div></td>
+                <td>四之二<div class="horizontal"></div></td>
+                <td>四之三<div class="horizontal"></div></td>
             </tr>
+            <tr><td colspan="3" style="height:1px;"><div class="verticle"></div></td></tr>
             <tr>
-                <td>五之一</td>
-                <td>五之二</td>
-                <td>五之三</td>
+                <td>五之一<div class="horizontal"></div></td>
+                <td>五之二<div class="horizontal"></div></td>
+                <td>五之三<div class="horizontal"></div></td>
             </tr>
+            <tr><td colspan="3" style="height:1px;"><div class="verticle"></div></td></tr>
             <tr>
-                <td>六之一</td>
-                <td>六之二</td>
-                <td>六之三</td>
+                <td>六之一<div class="horizontal"></div></td>
+                <td>六之二<div class="horizontal"></div></td>
+                <td>六之三<div class="horizontal"></div></td>
             </tr>
+            <tr><td colspan="3" style="height:1px;"><div class="verticle"></div></td></tr>
         </table>
     </div>
     <script>
@@ -105,6 +125,13 @@
             tbCreater.display(eleTable, parentDiv, insertBefore);
             //document.body.appendChild(eleTable);
         };
+
+        var horizontalDiv = document.getElementsByClassName('horizontal');
+        for (var i = 0; i < horizontalDiv.length; i++) {
+            horizontalDiv[0].addEventListener('mousedown', function (event) {
+                console.log(this,event);
+            }, false);
+        }
     </script>
 </body>
 </html>

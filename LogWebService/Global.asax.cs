@@ -23,8 +23,8 @@ namespace LogWebService
         {
             //被IIS執行起動的第一次進入點
             _MySession = new Dictionary<string, object>();
-            //好像沒用
-            this.Error += Global_Error;
+
+            this.Error += Global_Error;//好像沒用
             logDumper = new LogDumper();
             logBatcher = new LogBatcher();
             //qq = new Cache(); 
@@ -40,7 +40,7 @@ namespace LogWebService
         //
         void Global_Error(object sender, EventArgs e)
         {
-            var ss = ((Global)sender);
+            //var ss = ((Global)sender);
 
             this.Response.Write("Server端有問題:執行拋出的異常");
         }
@@ -53,7 +53,14 @@ namespace LogWebService
         protected void Application_BeginRequest(object sender, EventArgs e)
         {
             //這是網頁發出的Request進入點
-            
+            if (logDumper == null)
+            {
+                logDumper = new LogDumper();
+            }
+            if (logBatcher == null)
+            {
+                logBatcher = new LogBatcher();
+            }
         }
 
         protected void Application_AuthenticateRequest(object sender, EventArgs e)
