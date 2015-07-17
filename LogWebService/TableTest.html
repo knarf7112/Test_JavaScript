@@ -14,10 +14,11 @@
         table{
             margin: 0px auto;
             border-collapse: collapse;
-            /*border:1px solid blue;*/
+            border:1px solid blue;
         }
         th, td {
-            /*border:1px solid blue;*/
+            border:1px solid blue;
+            border-left: 2px solid rgb(182, 255, 0);
             width: 200px;
             height: 50px;
             overflow: hidden;
@@ -28,16 +29,26 @@
         }
 
         .horizontal{
+            margin:0px 0px;
+            padding:0px 0px;
+            top:-1px;
+            border:1px solid rgba(0,0,0,0);
+            cursor:row-resize;
+            max-height:0px;
+        }
+        .horizontal:hover{
+            /*border:1px solid red;*/
+            background-color:red;
+        }
+        .vertical{
             margin-right: -5px;
-            border:1px solid red;
+            border:1px solid rgba(0,0,0,0);
             cursor:col-resize;
             float:right;
             min-height:100%;
         }
-        .verticle{
-            border:1px solid yellow;
-            cursor:row-resize;
-            max-height:1px;
+        .vertical:hover{
+            border:1px solid red;
         }
     </style>
     <script type="text/javascript" src="JS/TableManager.js" async></script>
@@ -54,48 +65,48 @@
     <div id="testSection">
         <table id="tb1">
             <tr>
-                <th>測試標題1<div class="horizontal"></div></th>
-                <th>測試標題2<div class="horizontal"></div></th>
-                <th>測試標題3<div class="horizontal"></div></th>
+                <th>測試標題1<span class="vertical"></span></th>
+                <th>測試標題2<span class="vertical"></span></th>
+                <th>測試標題3<span class="vertical"></span></th>
             </tr>
-            <tr><td colspan="3" style="height:1px;"><div class="verticle"></div></td></tr>
+            <tr><td colspan="3" style="height:1px;" class="horizontal"></td></tr>
             <tr>
-                <td>一之一<div class="horizontal"></div></td>
+                <td>一之一<span class="vertical"></span></td>
                 <!--<td colspan="2">一之二</td>-->
-                <td>一之二<div class="horizontal"></div></td>
-                <td>一之三<div class="horizontal"></div></td>
+                <td>一之二<span class="vertical"></span></td>
+                <td>一之三<span class="vertical"></span></td>
             </tr>
-            <tr><td colspan="3" style="height:1px;"><div class="verticle"></div></td></tr>
+            <tr><td colspan="3" style="height:1px;" class="horizontal"></td></tr>
             <tr>
-                <td>二之一<div class="horizontal"></div></td>
-                <td>二之二<div class="horizontal"></div></td>
-                <td>二之三<div class="horizontal"></div></td>
+                <td>二之一<span class="vertical"></span></td>
+                <td>二之二<span class="vertical"></span></td>
+                <td>二之三<span class="vertical"></span></td>
             </tr>
-            <tr><td colspan="3" style="height:1px;"><div class="verticle"></div></td></tr>
+            <tr><td colspan="3" style="height:1px;" class="horizontal"></td></tr>
             <tr>
-                <td>三之一<div class="horizontal"></div></td>
-                <td>三之二<div class="horizontal"></div></td>
-                <td>三之三<div class="horizontal"></div></td>
+                <td>三之一<span class="vertical"></span></td>
+                <td>三之二<span class="vertical"></span></td>
+                <td>三之三<span class="vertical"></span></td>
             </tr>
-            <tr><td colspan="3" style="height:1px;"><div class="verticle"></div></td></tr>
+            <tr><td colspan="3" style="height:1px;" class="horizontal"></td></tr>
             <tr>
-                <td>四之一<div class="horizontal"></div></td>
-                <td>四之二<div class="horizontal"></div></td>
-                <td>四之三<div class="horizontal"></div></td>
+                <td>四之一<span class="vertical"></span></td>
+                <td>四之二<span class="vertical"></span></td>
+                <td>四之三<span class="vertical"></span></td>
             </tr>
-            <tr><td colspan="3" style="height:1px;"><div class="verticle"></div></td></tr>
+            <tr><td colspan="3" style="height:1px;" class="horizontal"></td></tr>
             <tr>
-                <td>五之一<div class="horizontal"></div></td>
-                <td>五之二<div class="horizontal"></div></td>
-                <td>五之三<div class="horizontal"></div></td>
+                <td>五之一<span class="vertical"></span></td>
+                <td>五之二<span class="vertical"></span></td>
+                <td>五之三<span class="vertical"></span></td>
             </tr>
-            <tr><td colspan="3" style="height:1px;"><div class="verticle"></div></td></tr>
+            <tr><td colspan="3" style="height:1px;" class="horizontal"></td></tr>
             <tr>
-                <td>六之一<div class="horizontal"></div></td>
-                <td>六之二<div class="horizontal"></div></td>
-                <td>六之三<div class="horizontal"></div></td>
+                <td>六之一<span class="vertical"></span></td>
+                <td>六之二<span class="vertical"></span></td>
+                <td>六之三<span class="vertical"></span></td>
             </tr>
-            <tr><td colspan="3" style="height:1px;"><div class="verticle"></div></td></tr>
+            <tr><td colspan="3" style="height:1px;" class="horizontal"></td></tr>
         </table>
     </div>
     <script>

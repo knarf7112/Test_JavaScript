@@ -12,35 +12,57 @@ var TableManager = function () {
 
 TableManager.prototype = {
     //建立並回傳新table DOM元素,使用DOMParser
-    //rows=表格列數量,column=表格欄數量,tableId=設定table的id屬性名稱,tbClassName=所有欄位的class屬性名稱
-    createTable: function (rows, columns, tableId, tdClassName) {
+    //rows=表格列數量,column=表格欄數量,tableId=設定table的id屬性名稱,tbClassName=所有欄位的class屬性名稱,flexibleBar=表示是否加入可拉縮的元素
+    createTable: function (rowCount, columnCount, tableAttributeString, cellAttributeString, hasFlexibleBar) {
         //elements
-        var className = !!tdClassName ? ( ' class="' + tdClassName + '"') : "";
-        var tableIdAttr = !!tableId ? (' id="' + tableId + '"') : "";
+        var tableAttr = !!tableAttributeString ? (" " + tableAttributeString.trim() + " ") : "";
+        var cellAttr = !!cellAttributeString ? (" " + cellAttributeString.trim() + " ") : "";
+        var rows = rowCount || 0;
+        var columns = columnCount || 0;
         var td = "";
         var th = "";
         var tr = "";
         var thead = "";
         var tbody = "";
         var table = "";
-        var parser = new DOMParser();
         var docHtml;
         var element;
+        var parser = new DOMParser();
 
         //td collection
         for (var j = 0; j < columns; j++) {
-            th += '<th' + className + '></th>';
-            td += '<td' + className + '></td>';
+            th += '<th' + cellAttr + '>' + (!!hasFlexibleBar ? '<span style="margin:0px 0px;' +
+                                                             'padding:0px 0px;' + 
+                                                             'border:1px solid rgba(0,0,0,0);' +
+                                                             'cursor:row-resize;" class="vertical' + j + '"></span>'
+                                                             :
+                                                             '') + '</th>';
+            td += '<td' + cellAttr + '>' + (!!hasFlexibleBar ? '<span style="margin:0px 0px;' +
+                                                             'padding:0px 0px;' +
+                                                             'border:1px solid rgba(0,0,0,0);' +
+                                                             'cursor:row-resize;" class="vertical' + j + '"></span>' : '') + '</td>';
         }
 
         //tr + td collection
         for (var i = 0; i < rows; i++) {
-            tr += "<tr>" + td + "</tr><div class='verticle'></div>";
+            tr += "<tr>" + td + "</tr>" +
+            (!!hasFlexibleBar ? '<tr><td conspan="' + columns + '" style="margin-right: -5px;' +
+                                                                'border:1px solid rgba(0,0,0,0);' +
+                                                                'cursor:col-resize;' +
+                                                                'float:right;" ' +
+                                                         'class="horizontal' + (i + 1) + '"></td></tr>'
+                           : '');
         }
 
-        thead = "<thead><tr>" + th + "</tr></thead>";
+        thead = "<thead><tr>" + th + "</tr>" + (!!hasFlexibleBar ? '<tr><td conspan="' + columns + '" style="margin-right: -5px;' +
+                                                                'border:1px solid rgba(0,0,0,0);' +
+                                                                'cursor:col-resize;' +
+                                                                'float:right;" ' +
+                                                                'class="horizontal0"></></tr>'
+                                                : '') + "</thead>";
         tbody = '<tbody>' + tr + '</tbody>';
-        table = '<table' + tableIdAttr + '>' + thead + tbody + '</table>';
+        table = '<table' + tableAttr + '>' + thead + tbody + '</table>';
+        console.log('table字串=>',table);
         docHtml = parser.parseFromString(table, 'text/html');
         element = docHtml.getElementsByTagName('table')[0];
 
@@ -53,8 +75,18 @@ TableManager.prototype = {
     //插入資料到表格元素
     //dataObj=資料陣列(裡面元素為{xxx:'xx'}),dataStartIndex=設定讀取的資料起始位置,tableElement=要改變資料的table元素
     insertData: function (dataAry, dataStartIndex, tableElement) {
-        var keys = Object.getOwnPropertyNames(dataAry[0]);
-        var trElements = tableElement.querySelectorAll('tr');
+        var startIndex = dataStartIndex || 0;
+        var keys;
+        var trElements;
+
+        if (!(dataAry instanceof Array)) {
+            console.error('插入資料非陣列元素!');
+            return;
+        }
+
+        keys = Object.getOwnPropertyNames(dataAry[0]);
+        tableElement.querySelectorAll('td[class^=]')
+        trElements = tableElement.querySelectorAll('tr');
         //clear table cell value
         for (var i = 0; i < trElements.length; i++) { //tr
             for (var j = 0; j < trElements[i].children.length; j++) { //td or th
@@ -65,9 +97,9 @@ TableManager.prototype = {
                     //tr
                 else {
                     //check data length if not overflow 
-                    if ((i + dataStartIndex - 1) < dataAry.length) {
-                        console.log(('dataObj[' + (i + dataStartIndex - 1) + '][' + keys[j] + ']'), dataAry[i + dataStartIndex - 1][keys[j]]);
-                        trElements[i].children[j].textContent = dataAry[i + dataStartIndex - 1][keys[j]];
+                    if ((i + startIndex - 1) < dataAry.length) {
+                        console.log(('dataObj[' + (i + startIndex - 1) + '][' + keys[j] + ']'), dataAry[i + startIndex - 1][keys[j]]);
+                        trElements[i].children[j].textContent = dataAry[i + startIndex - 1][keys[j]];
                     }
                     else {
                         trElements[i].children[j].textContent = '';
