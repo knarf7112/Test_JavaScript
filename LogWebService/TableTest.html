@@ -128,8 +128,8 @@
         startBtn2.onclick = function () {
             console.log('開始執行新增table');
             var tbCreater = new TableManager();
-            var eleTable = tbCreater.createTable(6, 3, 'tb1', 'td1');
-            console.log('開始執行插入資料到table');
+            var eleTable = tbCreater.createTable(6, 3, 'id="tb1"', 'style="width:150px;height:30px;"', true);
+            //console.log('開始執行插入資料到table');
             tbCreater.insertData(data, 2, eleTable);
             console.log('開始Display table');
             var insertBefore = insertCheck.checked;

@@ -31,34 +31,40 @@ TableManager.prototype = {
 
         //td collection
         for (var j = 0; j < columns; j++) {
-            th += '<th' + cellAttr + '>' + (!!hasFlexibleBar ? '<span style="margin:0px 0px;' +
+            th += '<th' + cellAttr + '>' + (!!hasFlexibleBar ? '<span style="margin-right: -5px;' +
                                                              'padding:0px 0px;' + 
                                                              'border:1px solid rgba(0,0,0,0);' +
-                                                             'cursor:row-resize;" class="vertical' + j + '"></span>'
+                                                             'float:right;" ' +
+                                                             'cursor:col-resize;" class="vertical' + j + '"></span>'
                                                              :
                                                              '') + '</th>';
-            td += '<td' + cellAttr + '>' + (!!hasFlexibleBar ? '<span style="margin:0px 0px;' +
+            td += '<td' + cellAttr + '>' + (!!hasFlexibleBar ? '<span style="margin-right: -5px;' +
                                                              'padding:0px 0px;' +
                                                              'border:1px solid rgba(0,0,0,0);' +
-                                                             'cursor:row-resize;" class="vertical' + j + '"></span>' : '') + '</td>';
+                                                             'float:right;" ' +
+                                                             'cursor:col-resize;" class="vertical' + j + '"></span>' : '') + '</td>';
         }
 
         //tr + td collection
         for (var i = 0; i < rows; i++) {
             tr += "<tr>" + td + "</tr>" +
-            (!!hasFlexibleBar ? '<tr><td conspan="' + columns + '" style="margin-right: -5px;' +
+            (!!hasFlexibleBar ? '<tr><td colspan="' + columns + '" style="margin:0px 0px;' +
+                                                                'width:0px;' +
+                                                                'height:0px;' +
+                                                                'padding:0px 0px;' + 
                                                                 'border:1px solid rgba(0,0,0,0);' +
-                                                                'cursor:col-resize;' +
-                                                                'float:right;" ' +
-                                                         'class="horizontal' + (i + 1) + '"></td></tr>'
+                                                                'cursor:row-resize;' +
+                                                                'class="horizontal' + (i + 1) + '"></td></tr>'
                            : '');
         }
 
-        thead = "<thead><tr>" + th + "</tr>" + (!!hasFlexibleBar ? '<tr><td conspan="' + columns + '" style="margin-right: -5px;' +
+        thead = "<thead><tr>" + th + "</tr>" + (!!hasFlexibleBar ? '<tr><td colspan="' + columns + '" style="margin:0px 0px;' +
+                                                                'width:0px;' +
+                                                                'height:0px;' +
+                                                                'padding:0px 0px;' +
                                                                 'border:1px solid rgba(0,0,0,0);' +
-                                                                'cursor:col-resize;' +
-                                                                'float:right;" ' +
-                                                                'class="horizontal0"></></tr>'
+                                                                'cursor:row-resize;' +
+                                                                'class="horizontal0"></td></tr>'
                                                 : '') + "</thead>";
         tbody = '<tbody>' + tr + '</tbody>';
         table = '<table' + tableAttr + '>' + thead + tbody + '</table>';
@@ -85,8 +91,9 @@ TableManager.prototype = {
         }
 
         keys = Object.getOwnPropertyNames(dataAry[0]);
-        tableElement.querySelectorAll('td[class^=]')
-        trElements = tableElement.querySelectorAll('tr');
+        //tableElement.querySelectorAll('td[class^=vertical]');
+        trElements = tableElement.querySelectorAll('td:not([class^=horizontal])');//不包含列縮放的元素
+        console.dir(trElements);
         //clear table cell value
         for (var i = 0; i < trElements.length; i++) { //tr
             for (var j = 0; j < trElements[i].children.length; j++) { //td or th
