@@ -1,0 +1,26 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        #test{
+            position:absolute;
+            width:800px;
+            height:600px;
+            top:100px;
+            left:100px;
+        }
+    </style>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+    <title>Test Grid</title>
+    <script src="JS/TableManager.js"></script>
+</head>
+<body>
+    <div id="test"></div>
+    <script>
+        var div1 = document.getElementById('test');
+        var test = new Grid({ displayNode: div1, column_order: [4, 3, 2, 1, 0] });
+        test.Initial();
+    </script>
+</body>
+</html>

@@ -3,6 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <title>TableManager測試</title>
+    <link rel="stylesheet" href="CSS/main.css" />
     <style>
         body {
             max-width: 1900px;
@@ -19,7 +20,7 @@
         th, td {
             border:1px solid blue;
             border-left: 2px solid rgb(182, 255, 0);
-            width: 200px;
+            /*width: 200px;*/
             height: 50px;
             overflow: hidden;
             word-wrap: break-word;
@@ -52,6 +53,8 @@
         }
     </style>
     <script type="text/javascript" src="JS/TableManager.js" async></script>
+    <!--<script type="text/javascript" src="JS/MouseEvent.js"></script>-->
+    <script type="text/javascript" src="JS/ResizeFunc.js"></script>
 </head>
 <body>
     <h1>此頁用來測試TableManager模組</h1>
@@ -65,18 +68,18 @@
     <div id="testSection">
         <table id="tb1">
             <tr>
-                <th>測試標題1<span class="vertical"></span></th>
+                <th style="width: 50px;">測試標題1<span class="vertical"></span></th>
                 <th>測試標題2<span class="vertical"></span></th>
-                <th>測試標題3<span class="vertical"></span></th>
+                <th onselectstart="return false;">測試標題3<span class="vertical"></span></th>
             </tr>
             <tr><td colspan="3" style="height:1px;" class="horizontal"></td></tr>
             <tr>
-                <td>一之一<span class="vertical"></span></td>
+                <td  aria-multiselectable="false">一之一<span class="vertical"></span></td>
                 <!--<td colspan="2">一之二</td>-->
                 <td>一之二<span class="vertical"></span></td>
                 <td>一之三<span class="vertical"></span></td>
             </tr>
-            <tr><td colspan="3" style="height:1px;" class="horizontal"></td></tr>
+            <tr><td colspan="3" style="margin: 0px 0px;padding:0px 0px;top:-1px;border:1px solid red;cursor:row-resize;height:10px;"></td></tr><!--height:1px;" class="horizontal"></td></tr>-->
             <tr>
                 <td>二之一<span class="vertical"></span></td>
                 <td>二之二<span class="vertical"></span></td>
@@ -110,6 +113,7 @@
         </table>
     </div>
     <script>
+        
         var data = [
             {帳號:'1-1',密碼:'123',姓名:'Test1'},{帳號:'2-1',密碼:'456',姓名:'Test2'},
             {帳號:'3-1',密碼:'789',姓名:'Test3'},{帳號:'4-1',密碼:'987',姓名:'Test4'},
@@ -123,6 +127,18 @@
             var tbCreater = new TableManager();
             tbCreater.insertData(data, 3, tb);
         };
+        var thList = document.querySelectorAll('table th');
+        var thArr = [];
+        for (var i = 0 ; i < thList.length; i++) {
+            var thResizeEvent = new ResizeFunc(thList[i]);
+            thResizeEvent.Init();
+            thArr.push(thResizeEvent);
+        }
+        //*************************************************************
+        //測試滑鼠事件值輸出
+        //var testMouseEvent = new MouseDrag(tb);
+        //testMouseEvent.BinddingEvent();
+        //testMouseEvent.bindEvent();
         //*************************************************************
         var startBtn2 = document.getElementById('startCreate');
         startBtn2.onclick = function () {
@@ -130,19 +146,22 @@
             var tbCreater = new TableManager();
             var eleTable = tbCreater.createTable(6, 3, 'id="tb1"', 'style="width:150px;height:30px;"', true);
             //console.log('開始執行插入資料到table');
-            tbCreater.insertData(data, 2, eleTable);
+            //tbCreater.insertData(data, 2, eleTable);
             console.log('開始Display table');
             var insertBefore = insertCheck.checked;
             tbCreater.display(eleTable, parentDiv, insertBefore);
             //document.body.appendChild(eleTable);
         };
-
+        /*
         var horizontalDiv = document.getElementsByClassName('horizontal');
         for (var i = 0; i < horizontalDiv.length; i++) {
             horizontalDiv[i].addEventListener('mousedown', function (event) {
                 console.log(this,event);
             }, false);
         }
+        */
+        
+
     </script>
 </body>
 </html>

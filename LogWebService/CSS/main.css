@@ -3,26 +3,47 @@
     text-align:left;
 }
 
-table, th, td{
+table{
+    margin:0px auto;
     border: 1px solid blue;
     border-collapse:collapse;
 }
 
 th, td{
+    border:1px solid blue;
     border-collapse:collapse;
-    width: 100px;
-    height: 100px;
-    overflow:hidden;
-    word-wrap:break-word;
+    /*width: 200px;*/
+    height: 50px;
+    overflow: hidden;
+    word-wrap: break-word;
     /*text-wrap:avoid;*/
     padding: 5px;
     text-align: left;
 }
 
 .verticle{
-    border: 1px solid blue;
+    margin-right: -5px;
+    border:1px solid rgba(0,0,0,0);
+    cursor:col-resize;
+    float:right;
+    min-height:100%;
+}
+.vertical:hover {
+    border: 1px solid red;
 }
 
 .horizontal{
-    border: 1px solid blue;
+    margin:0px 0px;
+    padding:0px 0px;
+    top:-1px;
+    border:1px solid rgba(0,0,0,0);
+    cursor:row-resize;
+    max-height:0px;
+}
+.horizontal:hover {
+        /*border:1px solid red;*/
+        background-color: red;
+}
+.test {
+    background-color: blue;
 }
