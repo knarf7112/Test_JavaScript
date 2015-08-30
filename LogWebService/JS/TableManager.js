@@ -558,7 +558,8 @@ var Grid = function (obj) {
             //元素綁定切頁事件
             element.onclick = function (event) {
                 if (event.target.getAttribute("data-type") === "control") {
-                    var target_page = event.target.textContent,
+                    //使用隱藏的value屬性
+                    var target_page = event.target.value,
                         tmp;
                     switch (target_page) {
                         case "-100":
@@ -601,7 +602,7 @@ var Grid = function (obj) {
     //切頁元素內容刷新
     this._control_refresh = function () {
         for (var index = 0; index < this.control_nodes.length; index++) {
-            this.control_nodes[index].node.textContent = this.control_nodes[index].data.value;
+            this.control_nodes[index].node.value = this.control_nodes[index].data.value;
             this.control_nodes[index].node.setAttribute('data-type', this.control_nodes[index].data.type);
             //若元素非+xxx或-xxx的
             if (index >= 3 && index < 13) {
