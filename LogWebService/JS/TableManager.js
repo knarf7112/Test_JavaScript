@@ -6,11 +6,86 @@
 //}
 //**********************************************
 //建立 table 框架 rows=>tr count, columns=>td count
-var TableManager = function () {
-    
-}
+var TableManager = function (obj) {
+    this.data = [];
+    this.displayNode = obj.displayNode;
+    //紀錄寬度(含border,padding,不含scrollBar)
+    this.width = obj.width || obj.displayNode.offsetWidth;
+    //紀錄高度(含border,padding,不含scrollBar)
+    this.height = obj.height || obj.displayNode.offsetHeight;
+    //紀錄欄數
+    this.column = obj.column || 5;
+    this.row = obj.row || 20;
+    this.gridNode;
+    //
+    this.init = function () {
+        //1.建立展示資料元素
+        this.createDisplayNode();
+        //2.設定元素位置
+        //3.綁定事件
+        //4.物件載入資料
+        //5.資料顯示
+    };
+    //
+    this.createDisplayNode = function () {
+        //建立展示資料元素
+        this.gridNode = this.new.create("div", this.column * this.row, 's1');
+    };
+};
+TableManager.prototype.new = {
+    //建立元素集合的節點 tagName=建立的元素名稱, amount=子元素的數量, className=元素類別名稱
+    create: function (tagName, amount, className) {
+        var parser = new DOMParser();
+        var childString = "";//temp
+        var classAttribute = className ? (' class="' + className + '"') : "";
+        var rootElement, docHtml;
+        //串子元素字串
+        for (var count = 0; count < amount; count++) {
+            childString += "<" + tagName + classAttribute + ">" + "</" + tagName + ">";
+        }
+        childString = "<" + tagName + classAttribute + ">" + childString + "</" + tagName + ">";
+        //console.log(childString);
+        docHtml = parser.parseFromString(childString, "text/html");
+        rootElement = docHtml.getElementsByTagName(tagName)[0];
+        console.dir(rootElement);
+        return rootElement;
+    },
+    //元素增加某個class
+    addClass: function (element, className) {
+        if (!(element instanceof HTMLElement)) {
+            throw new Error("注入元素非HTML物件");
+        }
 
-TableManager.prototype = {
+        if (this.isClassExist(className) && !element.classList.contains(className)) {
+            element.classList.add(className);
+        }
+    },
+    //若class存在於document內則回傳true,否則回傳false
+    isClassExist: function (className) {
+        var allStyleSheets = window.document.styleSheets;//get all style sheet include extent or intern at document load
+        //search all styleSheet
+        for (var styleSheetIndex = 0; styleSheetIndex < allStyleSheets.length; styleSheetIndex++) {
+            var rules = allStyleSheets[styleSheetIndex].cssRules || allStyleSheets[styleSheetIndex].rules;
+            //search all rules or cssRules
+            for (var ruleIndex = 0; ruleIndex < rules.length; ruleIndex++) {
+                if (className === rules[ruleIndex].selectorText) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    },
+    //元素移除某個class
+    removeClass: function (element, className) {
+        if (!(element instanceof HTMLElement)) {
+            throw new Error("注入元素非HTML物件");
+        }
+        if (element.classList.contains(className)) {
+            element.classList.remove(className);
+        }
+    },
+};
+TableManager.prototype.old = {
     //建立並回傳新table DOM元素,使用DOMParser
     //rows=表格列數量,column=表格欄數量,tableId=設定table的id屬性名稱,tbClassName=所有欄位的class屬性名稱,flexibleBar=表示是否加入可拉縮的元素
     createTable: function (rowCount, columnCount, tableAttributeString, cellAttributeString, hasFlexibleBar) {
