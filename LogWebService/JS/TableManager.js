@@ -8,20 +8,21 @@
 //建立 table 框架 rows=>tr count, columns=>td count
 var TableManager = function (obj) {
     this.data = [];
-    this.displayNode = obj.displayNode;
+    this.mainElement = obj.mainElement;
     //紀錄寬度(含border,padding,不含scrollBar)
-    this.width = obj.width || obj.displayNode.offsetWidth;
+    this.width = obj.width || obj.mainElement.offsetWidth;
     //紀錄高度(含border,padding,不含scrollBar)
-    this.height = obj.height || obj.displayNode.offsetHeight;
+    this.height = obj.height || obj.mainElement.offsetHeight;
     //紀錄欄數
     this.column = obj.column || 5;
     this.row = obj.row || 20;
-    this.gridNode;
+    this.gridElement;
     //
     this.init = function () {
         //1.建立展示資料元素
         this.createDisplayNode();
         //2.設定元素位置
+        this.set_position();
         //3.綁定事件
         //4.物件載入資料
         //5.資料顯示
@@ -29,9 +30,38 @@ var TableManager = function (obj) {
     //
     this.createDisplayNode = function () {
         //建立展示資料元素
-        this.gridNode = this.new.create("div", this.column * this.row, 's1');
+        this.gridElement = this.new.create("div", this.column * this.row, 's1');
+        this.mainElement.appendChild(this.gridElement);
     };
+    this.set_position = function () {
+        var main = this,
+            row,
+            column;
+        this.gridElement.style.position = "relative";
+        this.gridElement.style.border = "2px solid red";
+        this.gridElement.style.width = main.width + "px";
+        this.gridElement.style.height = main.height + "px";
+        this.gridElement.style.overflowX = "auto";
+        var childs = this.gridElement.children;
+        var childWidth = main.width / main.column - 10;
+        var childHeight = main.height / main.row - 1;
+        for (var childIndex = 0; childIndex < childs.length; childIndex++) {
+            //第m列
+            row = Math.floor(childIndex / main.column);
+            //第n欄
+            column = childIndex % main.column;
+            //設定相對於上一層的絕對位置
+            childs[childIndex].style.position = "absolute";
+            childs[childIndex].style.border = "2px solid blue";
+            childs[childIndex].style.width = childWidth + "px";
+            childs[childIndex].style.height = childHeight + "px";
+            childs[childIndex].style.left = (column * childWidth) + 10 + "px";
+            childs[childIndex].style.top = (row * childHeight) + 1 + "px";
+        }
+
+    }
 };
+//shared method
 TableManager.prototype.new = {
     //建立元素集合的節點 tagName=建立的元素名稱, amount=子元素的數量, className=元素類別名稱
     create: function (tagName, amount, className) {

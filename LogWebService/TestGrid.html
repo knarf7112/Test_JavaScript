@@ -9,6 +9,9 @@
             text-align:center;
             cursor:pointer;
         }
+        .s1:hover{
+            background-color:red;
+        }
         .title{
             background-color:#e28e52;
             font-weight:700;
@@ -96,8 +99,10 @@
         var div1 = document.getElementById('test');
 
         try {
-            var testGrid = new Grid({ displayNode: div1, column_order: [4, 3, 2, 1, 0] });
-            testGrid.JsonLoader(test);
+            //var testGrid = new Grid({ displayNode: div1, column_order: [4, 3, 2, 1, 0] });
+            //testGrid.JsonLoader(test);
+            var testGrid = new TableManager({ mainElement: div1 });
+            testGrid.init();
         }
         catch (ex) {
             console.error(ex);
