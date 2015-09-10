@@ -17,6 +17,10 @@ var TableManager = function (obj) {
     this.column = obj.column || 5;
     this.row = obj.row || 20;
     this.gridElement;
+    this.controlBarCount = this.column;
+    this.controlBarNodeList = [];
+
+    this.flexBarWidth = 10;
     //
     this.init = function () {
         //1.建立展示資料元素
@@ -27,12 +31,13 @@ var TableManager = function (obj) {
         //4.物件載入資料
         //5.資料顯示
     };
-    //
+    //1.建立展示資料元素
     this.createDisplayNode = function () {
         //建立展示資料元素
         this.gridElement = this.new.create("div", this.column * this.row, 's1');
         this.mainElement.appendChild(this.gridElement);
     };
+    //2.設定元素位置
     this.set_position = function () {
         var main = this,
             row,
@@ -43,8 +48,9 @@ var TableManager = function (obj) {
         this.gridElement.style.height = main.height + "px";
         this.gridElement.style.overflowX = "auto";
         var childs = this.gridElement.children;
-        var childWidth = main.width / main.column - 10;
-        var childHeight = main.height / main.row - 1;
+        var childWidth = (main.width / main.column);
+        var childHeight = (main.height / main.row);
+
         for (var childIndex = 0; childIndex < childs.length; childIndex++) {
             //第m列
             row = Math.floor(childIndex / main.column);
@@ -53,13 +59,17 @@ var TableManager = function (obj) {
             //設定相對於上一層的絕對位置
             childs[childIndex].style.position = "absolute";
             childs[childIndex].style.border = "2px solid blue";
-            childs[childIndex].style.width = childWidth + "px";
-            childs[childIndex].style.height = childHeight + "px";
-            childs[childIndex].style.left = (column * childWidth) + 10 + "px";
-            childs[childIndex].style.top = (row * childHeight) + 1 + "px";
+            childs[childIndex].style.width = (childWidth - this.flexBarWidth) + "px";
+            childs[childIndex].style.height = (childHeight - 4) + "px";
+            childs[childIndex].style.left = (column * childWidth) + "px";
+            childs[childIndex].style.top = (row * childHeight) + "px";
         }
 
-    }
+    };
+    //3.
+    this.createControl = function () {
+
+    };
 };
 //shared method
 TableManager.prototype.new = {
