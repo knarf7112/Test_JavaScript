@@ -17,17 +17,33 @@ var TableManager = function (obj) {
     this.column = obj.column || 5;
     this.row = obj.row || 20;
     this.gridElement;
-    this.controlBarCount = this.column;
-    this.controlBarNodeList = [];
-
+    this.refineElements = [];
+    this.flexiBarCount = this.column;
+    this.flexiBarRootNode;
+    this.flexiBarList = [];
+    this.X_range = 0;
+    this.X_start;
+    this.X_end;
+    this.columnWidth;//欄寬基準
+    this.rowHeight;//列高基準
     this.flexBarWidth = 10;
     //
     this.init = function () {
         //1.建立展示資料元素
         this.createDisplayNode();
-        //2.設定元素位置
-        this.set_position();
-        //3.綁定事件
+        //2.重新定義元素結構
+        this.redefineGridNodesStruct();
+        //3.設定元素位置
+        this.set_nodeCSS_property();
+        //3.設定Grid的所有元素style
+        this.set_elementCSSStyle();
+        //4.建立flexi bar
+        this.createFlexiBar();
+        //5.
+        this.set_flexiBarCssStyle();
+        //6.
+        this.bind_flexiBar_evnt();
+        //4.綁定事件
         //4.物件載入資料
         //5.資料顯示
     };
@@ -37,36 +53,158 @@ var TableManager = function (obj) {
         this.gridElement = this.new.create("div", this.column * this.row, 's1');
         this.mainElement.appendChild(this.gridElement);
     };
-    //2.設定元素位置
-    this.set_position = function () {
-        var main = this,
-            row,
-            column;
+    //2.設定自定義的node結構
+    this.redefineGridNodesStruct = function () {
+        var container = [],
+            innerContainer = [],
+            allChilds = this.gridElement.children;
+            
+
+        for (var elementIndex = 0; elementIndex < allChilds.length; elementIndex++) {
+            //defined data content
+            var data = {
+                row: (elementIndex % this.row),//column導向    //Math.floor(elementIndex / this.column),  //row導向
+                column: Math.floor(elementIndex / this.row),  //column導向 //(elementIndex % this.column),//列導向
+                nodeCSS: {},
+                node: allChilds[elementIndex],
+                value: "",
+                type: (elementIndex % this.row == 0) ? "header" : "body"////column導向       //(Math.floor(elementIndex / this.column) == 0) ? "header" : "body"//row導向
+            };
+            
+            //[[{}]] => column( row( data Object ) )
+            //若不存在建立新的陣列容器
+            if (!container[data.column]) {
+                container.push([]);
+            }
+            //直接指定
+            container[data.column][data.row] = data;
+        }
+        console.log('refine result',container);
+        //結果輸出
+        this.refineElements = container;
+    };
+    //3.設定自定義的node結構的CSS屬性
+    this.set_nodeCSS_property = function () {
+        var main = this;
+        //set every column width and height
+        main.columnWidth = (main.width / main.column);
+        main.rowHeight = (main.height / main.row);
+
+        //main object's refinedElement property set value into nodeCSS property
+        for (var columnIndex = 0; columnIndex < main.column; columnIndex++) {
+            for (var rowIndex = 0; rowIndex < main.row; rowIndex++) {
+                var cssStyle = {
+                    position: "absolute",
+                    width: (main.columnWidth - main.flexBarWidth) + "px",
+                    height: (main.rowHeight - 0) + "px",
+                    top: (rowIndex * main.rowHeight) + "px",//因以欄位為基準,所以剛好相反
+                    left: (columnIndex * main.columnWidth) + "px",
+                    border: "1px solid black"
+                };
+                main.refineElements[columnIndex][rowIndex].nodeCSS = cssStyle;
+            }
+        }
+        console.log('CSS inject',main.refineElements);
+    };
+    //3.設定Grid元素的CSS Style屬性
+    this.set_elementCSSStyle = function () {
+        var main = this;
         this.gridElement.style.position = "relative";
         this.gridElement.style.border = "2px solid red";
         this.gridElement.style.width = main.width + "px";
         this.gridElement.style.height = main.height + "px";
-        this.gridElement.style.overflowX = "auto";
-        var childs = this.gridElement.children;
-        var childWidth = (main.width / main.column);
-        var childHeight = (main.height / main.row);
+        this.gridElement.style.overflowX = "auto";//
+        
+        //object css set into element css style
+        for (var columnIndex = 0; columnIndex < main.column; columnIndex++) {
+            for (var rowIndex = 0; rowIndex < main.row; rowIndex++) {
+                for (var property in main.refineElements[columnIndex][rowIndex].nodeCSS) {
+                    main.refineElements[columnIndex][rowIndex].node.style[property] = main.refineElements[columnIndex][rowIndex].nodeCSS[property];
+                }
 
-        for (var childIndex = 0; childIndex < childs.length; childIndex++) {
-            //第m列
-            row = Math.floor(childIndex / main.column);
-            //第n欄
-            column = childIndex % main.column;
-            //設定相對於上一層的絕對位置
-            childs[childIndex].style.position = "absolute";
-            childs[childIndex].style.border = "2px solid blue";
-            childs[childIndex].style.width = (childWidth - this.flexBarWidth) + "px";
-            childs[childIndex].style.height = (childHeight - 4) + "px";
-            childs[childIndex].style.left = (column * childWidth) + "px";
-            childs[childIndex].style.top = (row * childHeight) + "px";
+            }
         }
-
     };
-    //3.
+    //4.建立縮放元素
+    this.createFlexiBar = function () {
+        var main = this,
+            tmpNodes;
+        //建立 flexi bar 元素
+        main.flexiBarRootNode = main.new.create('div', main.flexiBarCount, 'flexiBar');
+        //casting to array
+        tmpNodes = Array.prototype.slice.call(main.flexiBarRootNode.children);//轉成陣列元素
+        console.log('flexi Bar List', tmpNodes);
+        //set property into main object //iterator
+        tmpNodes.forEach(function (currentElement, index, array) {
+            var data = {
+                index: index,
+                X_changeValue: 0,//滑鼠事件的移動變化值(原始值的遞增或遞減)
+                node: currentElement,
+                nodeCSS: {
+                    position: "absolute",
+                    border: "1px solid yellow",
+                    backgroundColor: "red",
+                    width: "10px",
+                    height: main.height + "px",
+                    left: (main.columnWidth * (index + 1)) - 10 + "px",
+                    top: "0px"
+                },
+                type: "flexiBar"
+            };
+            //console.log(currentElement);
+            main.flexiBarList.push(data);
+        });
+        //輸出到Grid元素上
+        //main.gridElement.appendChild(main.flexiBarRootNode);
+    };
+    //5.
+    this.set_flexiBarCssStyle = function () {
+        var main = this,
+            flexiNodes = main.flexiBarRootNode.children;
+
+        main.flexiBarList.forEach(function (currentElement, index, array) {
+            for (var property in currentElement.nodeCSS) {
+                flexiNodes[index].style[property] = currentElement.nodeCSS[property];
+            }
+        });
+        //輸出到Grid元素上
+        main.gridElement.appendChild(main.flexiBarRootNode);
+    };
+    //6.flexi bar bind mouse evnt and calculate X range
+    this.bind_flexiBar_evnt = function () {
+        var main = this,
+            moveFlag = false;
+        main.flexiBarList.forEach(function (currentElement, index, array) {
+            //console.log("CurrentElement", currentElement);
+            //currentElement.node.setAttribute("unselectable", "on");//沒啥效果
+            //currentElement.node.setAttribute("draggable", "false");//沒啥效果
+            //currentElement.node.style.userSelect = "none";  //IE Only
+            currentElement.node.addEventListener("mousedown", function (e) {
+                e.stopPropagation();
+                e.preventDefault();//因為DOM被drag的關係造成mouseup被跳過
+                //ref:http://stackoverflow.com/questions/69430/is-there-a-way-to-make-text-unselectable-on-an-html-page
+                console.log("Down2", e);
+                moveFlag = true;
+                main.X_start = e.pageX;
+                console.log("Down:pageX ", main.X_start);
+            }, false);
+        });
+
+        document.body.addEventListener("mousemove", function (e) {
+            if (moveFlag) {
+                console.log("Move", e);
+                main.X_end = e.pageX;
+                //console.log("srcollLeft", document.body.scrollLeft, "main.X_end", main.X_end, "main.X_start", main.X_start);
+                main.X_range = document.body.scrollLeft + main.X_end - main.X_start;
+                console.log("Range", main.X_range);
+            }
+        });
+        document.body.addEventListener("mouseup", function (e) {
+            console.log("Up", e);
+            moveFlag = false;
+        });
+    };
+    //
     this.createControl = function () {
 
     };
@@ -83,11 +221,12 @@ TableManager.prototype.new = {
         for (var count = 0; count < amount; count++) {
             childString += "<" + tagName + classAttribute + ">" + "</" + tagName + ">";
         }
+        //加上一個root元素
         childString = "<" + tagName + classAttribute + ">" + childString + "</" + tagName + ">";
         //console.log(childString);
         docHtml = parser.parseFromString(childString, "text/html");
         rootElement = docHtml.getElementsByTagName(tagName)[0];
-        console.dir(rootElement);
+        console.log('create new DOM',rootElement);
         return rootElement;
     },
     //元素增加某個class
