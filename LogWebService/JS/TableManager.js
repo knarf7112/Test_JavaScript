@@ -26,25 +26,23 @@ var TableManager = function (obj) {
     this.X_end;
     this.columnWidth;//欄寬基準
     this.rowHeight;//列高基準
-    this.flexBarWidth = 10;
+    this.flexiBarWidth = 10;
     //
     this.init = function () {
         //1.建立展示資料元素
         this.createDisplayNode();
         //2.重新定義元素結構
         this.redefineGridNodesStruct();
-        //3.設定元素位置
-        this.set_nodeCSS_property();
-        //4.設定主grid元素外框CSS style
+        //3.設定主grid元素外框CSS style
         this.set_gridRootNodeStyle();
-        //5.設定Grid的所有元素style
-        this.set_allDisplayElementCssStyle();
-        //6.建立flexi bar
+        //4.刷新Grid的所有元素style
+        this.refresh_allDisplayElementCssStyle();
+        //5.建立flexi bar
         this.createFlexiBar();
-        //7.
-        this.set_flexiBarCssStyle();
+        //6.
+        this.refresh_flexiBarCssStyle();
         //8.
-        this.bind_flexiBar_evnt();
+        this.bind_flexiBar_event();
         //4.綁定事件
         //4.物件載入資料
         //5.資料顯示
@@ -57,21 +55,35 @@ var TableManager = function (obj) {
     };
     //2.設定自定義的node結構
     this.redefineGridNodesStruct = function () {
-        var container = [],
+        var main = this,
+            container = [],
             innerContainer = [],
             allChilds = this.gridElement.children;
             
+        //set every column width and height(設定欄位平均寬度和厚度)
+        main.columnWidth = (main.width / main.column);
+        main.rowHeight = (main.height / main.row);
 
         for (var elementIndex = 0; elementIndex < allChilds.length; elementIndex++) {
-            //defined data content
-            var data = {
-                row: (elementIndex % this.row),//column導向    //Math.floor(elementIndex / this.column),  //row導向
-                column: Math.floor(elementIndex / this.row),  //column導向 //(elementIndex % this.column),//列導向
-                nodeCSS: {},
-                node: allChilds[elementIndex],
-                value: "",
-                type: (elementIndex % this.row == 0) ? "header" : "body"////column導向       //(Math.floor(elementIndex / this.column) == 0) ? "header" : "body"//row導向
-            };
+            var rowIndex = (elementIndex % main.row),
+                columnIndex = Math.floor(elementIndex / this.row),
+                //defined data content(自訂的資料物件)
+                data = {
+                    row: rowIndex,//column導向                    //Math.floor(elementIndex / this.column),  //row導向
+                    column: columnIndex,  //column導向            //(elementIndex % this.column),//列導向
+                    default_Width: main.columnWidth,               //平均寬度:預設値
+                    nodeCSS: {                                    //CSS Style 
+                        position: "absolute",
+                        width: (main.columnWidth - main.flexiBarWidth) + "px",
+                        height: (main.rowHeight - 0) + "px",
+                        top: (rowIndex * main.rowHeight) + "px",//因以欄位為基準,所以剛好相反
+                        left: (columnIndex * main.columnWidth) + "px",
+                        border: "1px solid black"
+                    },
+                    node: allChilds[elementIndex],
+                    value: "",
+                    type: (elementIndex % main.row == 0) ? "header" : "body"////column導向       //(Math.floor(elementIndex / this.column) == 0) ? "header" : "body"//row導向
+                };
             
             //[[{}]] => column( row( data Object ) )
             //若不存在建立新的陣列容器
@@ -85,30 +97,7 @@ var TableManager = function (obj) {
         //結果輸出
         this.refineNodeTable = container;
     };
-    //3.設定自定義的node結構的CSS屬性
-    this.set_nodeCSS_property = function () {
-        var main = this;
-        //set every column width and height
-        main.columnWidth = (main.width / main.column);
-        main.rowHeight = (main.height / main.row);
-
-        //main object's refinedElement property set value into nodeCSS property
-        for (var columnIndex = 0; columnIndex < main.column; columnIndex++) {
-            for (var rowIndex = 0; rowIndex < main.row; rowIndex++) {
-                var cssStyle = {
-                    position: "absolute",
-                    width: (main.columnWidth - main.flexBarWidth) + "px",
-                    height: (main.rowHeight - 0) + "px",
-                    top: (rowIndex * main.rowHeight) + "px",//因以欄位為基準,所以剛好相反
-                    left: (columnIndex * main.columnWidth) + "px",
-                    border: "1px solid black"
-                };
-                main.refineNodeTable[columnIndex][rowIndex].nodeCSS = cssStyle;
-            }
-        }
-        console.log('CSS inject',main.refineNodeTable);
-    };
-    //4.設定主grid元素外框CSS style
+    //3.設定主grid元素外框CSS style
     this.set_gridRootNodeStyle = function () {
         var main = this;
         main.gridElement.style.position = "relative";
@@ -117,19 +106,27 @@ var TableManager = function (obj) {
         main.gridElement.style.height = main.height + "px";
         main.gridElement.style.overflowX = "auto";//
     }
-    //5.設定Grid內所有display元素的CSS Style屬性
-    this.set_allDisplayElementCssStyle = function (mainObj) {
-        var main = mainObj || this;        
-        //object css set into element css style
-        for (var columnIndex = 0; columnIndex < main.column; columnIndex++) {
+    //4.刷新Grid內所有display元素的CSS Style屬性或指定的CSS屬性
+    this.refresh_allDisplayElementCssStyle = function (mainObj, columnIndex, propertyName) {
+        var main = mainObj || this;
+        //object css set into element css style 刷新所有展
+        for (var column_Index = columnIndex || 0; column_Index < main.column; column_Index++) {
             for (var rowIndex = 0; rowIndex < main.row; rowIndex++) {
-                for (var property in main.refineNodeTable[columnIndex][rowIndex].nodeCSS) {
-                    main.refineNodeTable[columnIndex][rowIndex].node.style[property] = main.refineNodeTable[columnIndex][rowIndex].nodeCSS[property];
+                //若無指定CSS屬性名稱
+                if (!propertyName) {
+                    //全部刷新
+                    for (var property in main.refineNodeTable[column_Index][rowIndex].nodeCSS) {
+                        main.refineNodeTable[column_Index][rowIndex].node.style[property] = main.refineNodeTable[column_Index][rowIndex].nodeCSS[property];
+                    }
+                }
+                else {
+                    //指定刷新
+                    main.refineNodeTable[column_Index][rowIndex].node.style[propertyName] = main.refineNodeTable[column_Index][rowIndex].nodeCSS[propertyName];
                 }
             }
         }
     };
-    //6.create flexi bar and set property 
+    //5.create flexi bar and set property 
     this.createFlexiBar = function () {
         var main = this,
             tmpNodes;
@@ -140,9 +137,11 @@ var TableManager = function (obj) {
         console.log('flexi Bar List', tmpNodes);
         //set property into main object //iterator
         tmpNodes.forEach(function (currentElement, index, array) {
-            var data = {
+            var default_left = ((main.columnWidth * (index + 1)) - 10),
+                data = {
                 index: index,
-                X_changeValue: 0,//滑鼠事件的移動變化值(原始值的遞增或遞減)
+                default_Left: default_left,
+                X_deviation: 0,//滑鼠事件的移動變化值(原始值的遞增或遞減)
                 node: currentElement,
                 nodeCSS: {
                     position: "absolute",
@@ -150,7 +149,7 @@ var TableManager = function (obj) {
                     backgroundColor: "red",
                     width: "10px",
                     height: main.height + "px",
-                    left: (main.columnWidth * (index + 1)) - 10 + "px",
+                    left: default_left + "px",
                     top: "0px"
                 },
                 type: "flexiBar"
@@ -161,32 +160,35 @@ var TableManager = function (obj) {
         //輸出到Grid元素上
         main.gridElement.appendChild(main.flexiBarRootNode);
     };
-    //6.set flexi bar css style 
-    this.set_flexiBarCssStyle = function (propertyName) {
-        var main = this;
-            //flexiNodes = main.flexiBarRootNode.children;
-
-        main.flexiBarNodeList.forEach(function (currentElement, index, array) {
-            //若有指定更改某屬性
+    //6.refresh flexi bar css style 
+    this.refresh_flexiBarCssStyle = function (mainObj, columnIndex, propertyName) {
+        var main = mainObj || this;
+        //flexiNodes = main.flexiBarRootNode.children;
+        //設定所有縮放元素,若有指定起始index則取指定値當起始値
+        for (var index = columnIndex || 0; index < main.flexiBarNodeList.length; index++) {
+            //若有指定設定名稱
             if (!!propertyName) {
-                //確認物件內的屬性是否有資料
-                if (!!currentElement.nodeCSS[propertyName]) {
-                    currentElement.node.style[propertyName] = currentElement.nodeCSS[propertyName];
-                }
-                else {
-                    throw new Error("flexi bar的nodeCSS屬性:" + propertyName + "不存在");
-                }
+                main.flexiBarNodeList[index].node.style[propertyName] = main.flexiBarNodeList[index].nodeCSS[propertyName];
             }
             else {
-                //物件的全部Style屬性值刷新到DOM元素上
-                for (var property in currentElement.nodeCSS) {
-                    currentElement.node.style[property] = currentElement.nodeCSS[property];
+                //設定所有Css Style
+                for (var property in main.flexiBarNodeList[index].nodeCSS) {
+                    main.flexiBarNodeList[index].node.style[property] = main.flexiBarNodeList[index].nodeCSS[property];
                 }
             }
-        });
+        }
+            //設定所有縮放元素inline CSS値
+            //main.flexiBarNodeList.forEach(function (currentElement, index, array) {
+            //    //物件的全部Style屬性值刷新到DOM元素上
+            //    for (var property in currentElement.nodeCSS) {
+            //        currentElement.node.style[property] = currentElement.nodeCSS[property];
+            //    }
+
+            //});
+        
     };
     //7.flexi bar bind mouse evnt and calculate X range(Closure)
-    this.bind_flexiBar_evnt = function () {
+    this.bind_flexiBar_event = function () {
         var main = this,
             moveFlag = false,
             flexiBarIndex = 0;//紀錄當前觸發flexi bar 的索引值,當作column index
@@ -211,8 +213,12 @@ var TableManager = function (obj) {
                 console.log("Move", e);
                 main.X_end = e.pageX;
                 //console.log("srcollLeft", document.body.scrollLeft, "main.X_end", main.X_end, "main.X_start", main.X_start);
-                main.flexiBar_X_rangeList[flexiBarIndex] = document.body.scrollLeft + main.gridElement.scrollLeft + main.X_end - main.X_start;//取得間距
+                //設定指定欄位間距
+                main.flexiBar_X_rangeList[flexiBarIndex] = (document.body.scrollLeft + main.gridElement.scrollLeft + main.X_end - main.X_start);//取得間距
                 console.log("Range", main.flexiBar_X_rangeList[flexiBarIndex]);
+                main._change_ElementCssStyle(main, flexiBarIndex, main.flexiBar_X_rangeList[flexiBarIndex]);
+                //main.set_allDisplayElementCssStyle(main, flexiBarIndex, 'left');
+                //main.set_flexiBarCssStyle(main, flexiBarIndex, 'left');
             }
         });
         document.addEventListener("mouseup", function (e) {
@@ -220,30 +226,44 @@ var TableManager = function (obj) {
             moveFlag = false;//關閉mousemove
         });
     };
-    //7-1.變更指定元素(整欄元素寬度與flexi bar元素位置)CSS style
-    this._change_ElementCssStyle = function ( mainObj, columnIndex, x_range) {
+    //7-1.變更資料物件內指定的縮放物件與(整欄元素寬度與flexi bar元素位置)CSS style
+    this._change_NodeCSS = function ( mainObj, columnIndex, x_range) {
         if (!mainObj.gridElement) {
-            throw new Error("grid element not exist!");
+            throw new Error("[_change_ElementCssStyle]grid element not exist!");
         }
         else if(isNaN(x_range)){
-            throw new Error('parameter: x_range is not a number =>' + x_range);
+            throw new Error('[_change_ElementCssStyle]parameter: x_range is not a number =>' + x_range);
         }
         else {
-            //依據傳入index抓取refineNodeTable指定column的第一列元素inline的left設定值
-            var last_Left = (!!mainObj.refineNodeTable[columnIndex][0].style.left && !isNaN(mainObj.refineNodeTable[columnIndex][0].style.left.split('px')[0])) ?
-                parseInt(mainObj.refineNodeTable[columnIndex][0].style.left.split('px')[0], 10) : 50;//若沒有就設定預設值:50
-            
-            var currentLeft = mainObj.flexiBar_X_rangeList[index] + last_Left;
-
-            //變更物件nodeCSS的left屬性值
-            for (var rowIndex = 0; rowIndex < mainObj.flexiBarXmain.refineNodeTable[columnIndex].length; rowIndex++) {
-                main.refineNodeTable[columnIndex][rowIndex].nodeCSS["left"] = currentLeft + "px";
+            //變更偏差値
+            mainObj.flexiBarNodeList[columnIndex].X_deviation += x_range;
+            var accumulate_deviation;//累積目前欄位的偏差値
+            //從指定的欄位變更包含此欄位後面的資料物件
+            for (var column_Index = columnIndex; column_Index < mainObj.refineNodeTable.length; column_Index++) {
+                //變更縮放物件的left位置
+                mainObj.flexiBarNodeList[column_Index].nodeCSS.left = ((mainObj.flexiBarNodeList[column_Index].default_Left * (column_Index + 1)) + accumulate_deviation) + "px";
+                //DOTO...................
+                //變更Grid物件的width和後面的left位置
+                for (var rowIndex = 0; rowIndex < mainObj.refineNodeTable[columnIndex].length; rowIndex++) {
+                    //若為指定的欄位
+                    if(column_Index === columnIndex){
+                        //變更資料物件的寬度屬性值
+                        mainObj.refineNodeTable[column_Index][rowIndex].nodeCSS.width = (mainObj.refineNodeTable[column_Index][rowIndex].default_Width + mainObj.flexiBarNodeList[column_Index].X_deviation) + "px";
+                    }
+                    else {
+                        //變更資料物件的left位置(即變更指定欄位的後面所有欄位X軸位置)
+                        mainObj.refineNodeTable[column_Index][rowIndex].nodeCSS.left = (mainObj.refineNodeTable[column_Index][rowIndex].default_Width * (column_Index + 1) + accumulate_deviation) + "px";
+                    }
+                }
+                accumulate_deviation += mainObj.flexiBarNodeList[column_Index].X_deviation;
             }
-
+            //mainObj.flexiBarNodeList[columnIndex].nodeCSS.left = cuurentflexiBarNodeLeft + "px";
+            
+            
         }
     };
     //
-
+    //this._deviation
     this.createControl = function () {
 
     };
