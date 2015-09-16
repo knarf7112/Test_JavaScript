@@ -72,13 +72,14 @@ var TableManager = function (obj) {
                     row: rowIndex,//column導向                    //Math.floor(elementIndex / this.column),  //row導向
                     column: columnIndex,  //column導向            //(elementIndex % this.column),//列導向
                     default_Width: main.columnWidth,               //平均寬度:預設値
+                    default_Left:(columnIndex * main.columnWidth),
                     nodeCSS: {                                    //CSS Style 
                         position: "absolute",
-                        width: (main.columnWidth - main.flexiBarWidth) + "px",
-                        height: (main.rowHeight - 0) + "px",
+                        width: (main.columnWidth) + "px",
+                        height: (main.rowHeight) + "px",
                         top: (rowIndex * main.rowHeight) + "px",//因以欄位為基準,所以剛好相反
                         left: (columnIndex * main.columnWidth) + "px",
-                        border: "1px solid black"
+                        border: "1px solid red"
                     },
                     node: allChilds[elementIndex],
                     value: "",
@@ -146,7 +147,7 @@ var TableManager = function (obj) {
                 nodeCSS: {
                     position: "absolute",
                     border: "1px solid yellow",
-                    backgroundColor: "red",
+                    backgroundColor: "",
                     width: "10px",
                     height: main.height + "px",
                     left: default_left + "px",
@@ -211,83 +212,74 @@ var TableManager = function (obj) {
         document.addEventListener("mousemove", function (e) {
             if (moveFlag) {
                 //console.log("Move", e);
-                main.X_end = e.pageX;
+                main.X_end = e.pageX;//X axis end position
                 //console.log("srcollLeft", document.body.scrollLeft, "main.X_end", main.X_end, "main.X_start", main.X_start);
-                //設定指定欄位間距
+                //設定目前指定索引的間距
                 main.flexiBar_X_rangeList[flexiBarIndex] = (document.body.scrollLeft + main.gridElement.scrollLeft + main.X_end - main.X_start);//取得間距
                 console.log("Range", main.flexiBar_X_rangeList[flexiBarIndex], "Index", flexiBarIndex);
                 //******************************************************************************************************
                 //測試用的hard coding
                 //直接設定縮放元素
 
-                main.flexiBarNodeList[flexiBarIndex].node.style.left = (main.flexiBarNodeList[flexiBarIndex].default_Left + main.flexiBar_X_rangeList[flexiBarIndex] + main.flexiBarNodeList[flexiBarIndex].X_deviation) + "px";
-                var tmp = main.flexiBar_X_rangeList[flexiBarIndex];
+                //main.flexiBarNodeList[flexiBarIndex].node.style.left = (main.flexiBarNodeList[flexiBarIndex].default_Left + main.flexiBar_X_rangeList[flexiBarIndex] + main.flexiBarNodeList[flexiBarIndex].X_deviation) + "px";
+                //var tmp = main.flexiBar_X_rangeList[flexiBarIndex];
                 //var tmp = 0;
-                for (var qq = flexiBarIndex + 1; qq < main.flexiBarNodeList.length; qq++) {
-                    //tmp = main.flexiBarNodeList[qq].X_deviation;
-                    main.flexiBarNodeList[qq].node.style.left = (main.flexiBarNodeList[qq].default_Left + tmp + main.flexiBarNodeList[qq].X_deviation) + "px";
-                    console.log('index' + qq, tmp);
+                //for (var qq = flexiBarIndex ; qq < main.flexiBarNodeList.length; qq++) {
+                //    //tmp = main.flexiBarNodeList[qq].X_deviation;
+                //    main.flexiBarNodeList[qq].node.style.left = (main.flexiBarNodeList[qq].default_Left + main.flexiBar_X_rangeList[flexiBarIndex] + main.flexiBarNodeList[qq].X_deviation) + "px";
+                //    console.log('index' + qq, tmp);
                     
-                }
+                //}
 
                 //******************************************************************************************************
+                //更新flexi bar並累計最後的X軸偏移量
+                main._update_nodeCSS_CssStyle(main, flexiBarIndex, main.flexiBar_X_rangeList[flexiBarIndex], 'left');
                 //main._update_refinedTableNodeCSS(main, flexiBarIndex, main.flexiBar_X_rangeList[flexiBarIndex]);
                 //main.set_allDisplayElementCssStyle(main, flexiBarIndex, 'left');
                 //main.refresh_flexiBarCssStyle(main, flexiBarIndex, 'left');
             }
         });
+        //mouse up event (設定最終的X axis偏移量)
         document.addEventListener("mouseup", function (e) {
             if (moveFlag) {
                 moveFlag = false;//關閉mousemove
-                //設定最終的偏移量
-                //main.flexiBarNodeList[flexiBarIndex].X_deviation += main.flexiBar_X_rangeList[flexiBarIndex];
-                for (var index = flexiBarIndex ; index < main.flexiBarNodeList.length; index++) {
-                    main.flexiBarNodeList[index].X_deviation += main.flexiBar_X_rangeList[flexiBarIndex];
-                }
-                console.log("Up", main.flexiBar_X_rangeList, main.flexiBarNodeList[0].X_deviation, main.flexiBarNodeList[1].X_deviation, main.flexiBarNodeList[2].X_deviation, main.flexiBarNodeList[3].X_deviation, main.flexiBarNodeList[4].X_deviation);
+                //設定最終的X axis偏移量(flexiBarNodeList陣列內所有的X_deviation)
+                main._update_flexiBar_last_Xdeviation(main, flexiBarIndex, main.flexiBar_X_rangeList[flexiBarIndex]);
+                //只看X偏移量,所以其它屬性濾掉了
+                console.log("Up:X軸偏移量", main.flexiBarNodeList.map(function (current, index, array) { return current.X_deviation; }));
             }
         });
     };
     //7-1.更新指定與其相關的dispaly物件和flexi bar物件的width值與left值(update specified column width and others left, update specified flexi bar width and others left )
-    this._update_refinedTableNodeCSS = function ( mainObj, columnIndex, x_range) {
-        if (!mainObj.gridElement) {
-            throw new Error("[_update_refinedTableNodeCSS]grid element not exist!");
-        }
-        else if(isNaN(x_range)){
-            throw new Error('[_update_refinedTableNodeCSS]parameter: x_range is not a number =>' + x_range);
-        }
-        else {
-            //變更偏差値  TODO ....  偏差值的變更應在mouseup事件做設定,否則會走回原來的預設職
-            mainObj.flexiBarNodeList[columnIndex].X_deviation = x_range;
-            var accumulate_deviation = 0;//累積當前欄位的偏差値
-            //從指定的欄位變更包含此欄位後面的資料物件
-            for (var column_Index = columnIndex; column_Index < mainObj.refineNodeTable.length; column_Index++) {
+    this._update_nodeCSS_CssStyle = function ( mainObj, columnIndex, x_range, propertyName) {
+        for (var index = columnIndex ; index < mainObj.flexiBarNodeList.length; index++) {
+            //更新flexi bar的nodeCSS內指定的屬性值
+            mainObj.flexiBarNodeList[index].nodeCSS[propertyName] = (mainObj.flexiBarNodeList[index].default_Left + x_range + mainObj.flexiBarNodeList[index].X_deviation) + "px";
+            //更新flexi bar元素的指定CSS style
+            mainObj.flexiBarNodeList[index].node.style[propertyName] = mainObj.flexiBarNodeList[index].nodeCSS[propertyName];
+            //更新display的nodeCSS內指定的屬性值
+            if (index === columnIndex) {
+                mainObj.refineNodeTable[index].forEach(function (currentElement, innerIndex, array) {
+                    currentElement.nodeCSS['width'] = currentElement.default_Width + x_range + mainObj.flexiBarNodeList[index].X_deviation + "px";//mainObj.flexiBarNodeList[index].X_deviation
+                    currentElement.node.style['width'] = currentElement.nodeCSS['width'];
+                });
                 
-                accumulate_deviation += mainObj.flexiBarNodeList[column_Index].X_deviation;
-                //變更縮放物件的left位置
-                mainObj.flexiBarNodeList[column_Index].nodeCSS.left = ((mainObj.flexiBarNodeList[column_Index].default_Left) + accumulate_deviation) + "px";
-
-                //變更Grid物件的width和後面的left位置
-                for (var rowIndex = 0; rowIndex < mainObj.refineNodeTable[column_Index].length; rowIndex++) {
-                    //若為指定的欄位
-                    if(column_Index === columnIndex){
-                        //變更資料物件的寬度屬性值
-                        mainObj.refineNodeTable[column_Index][rowIndex].nodeCSS.width = (mainObj.refineNodeTable[column_Index][rowIndex].default_Width + mainObj.flexiBarNodeList[column_Index].X_deviation) + "px";
-                    }
-                    else {
-                        //變更資料物件的left位置(即變更指定欄位的後面所有欄位X軸位置)
-                        mainObj.refineNodeTable[column_Index][rowIndex].nodeCSS.left = (mainObj.refineNodeTable[column_Index][rowIndex].default_Width * (column_Index + 1) + accumulate_deviation) + "px";
-                    }
-                }
             }
-            //mainObj.flexiBarNodeList[columnIndex].nodeCSS.left = cuurentflexiBarNodeLeft + "px";
-            
-            
+            else {
+                mainObj.refineNodeTable[index].forEach(function (currentElement, innerIndex, array) {
+                    //這邊有問題 DOTO.......
+                    currentElement.nodeCSS[propertyName] = currentElement.default_Left + 'px';// + x_range + mainObj.flexiBarNodeList[index].X_deviation + "px";
+                    currentElement.node.style[propertyName] = currentElement.nodeCSS[propertyName];
+                });
+            }
         }
+        console.log('Move refinedNodeList', mainObj.refineNodeTable);
     };
-    //7-2.
-    this._update_last_X_deviation = function(mainObj, columnIndex, x_range){
-
+    //7-2.更新flexi bar並累計最後的X軸偏移量(依據指定的索引變更並累計flexiBarNodeList陣列內所有的X_deviation)
+    this._update_flexiBar_last_Xdeviation = function(mainObj, columnIndex, x_range){
+        for (var index = columnIndex ; index < mainObj.flexiBarNodeList.length; index++) {
+            mainObj.flexiBarNodeList[index].X_deviation += x_range;
+        }
     }
     //this._deviation
     this.createControl = function () {
