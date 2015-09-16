@@ -216,16 +216,36 @@ var TableManager = function (obj) {
                 //設定指定欄位間距
                 main.flexiBar_X_rangeList[flexiBarIndex] = (document.body.scrollLeft + main.gridElement.scrollLeft + main.X_end - main.X_start);//取得間距
                 console.log("Range", main.flexiBar_X_rangeList[flexiBarIndex], "Index", flexiBarIndex);
+                //******************************************************************************************************
+                //測試用的hard coding
                 //直接設定縮放元素
-                main.flexiBarNodeList[flexiBarIndex].node.style.left = (main.flexiBarNodeList[flexiBarIndex].default_Left + main.flexiBar_X_rangeList[flexiBarIndex]) + "px";
+
+                main.flexiBarNodeList[flexiBarIndex].node.style.left = (main.flexiBarNodeList[flexiBarIndex].default_Left + main.flexiBar_X_rangeList[flexiBarIndex] + main.flexiBarNodeList[flexiBarIndex].X_deviation) + "px";
+                var tmp = main.flexiBar_X_rangeList[flexiBarIndex];
+                //var tmp = 0;
+                for (var qq = flexiBarIndex + 1; qq < main.flexiBarNodeList.length; qq++) {
+                    //tmp = main.flexiBarNodeList[qq].X_deviation;
+                    main.flexiBarNodeList[qq].node.style.left = (main.flexiBarNodeList[qq].default_Left + tmp + main.flexiBarNodeList[qq].X_deviation) + "px";
+                    console.log('index' + qq, tmp);
+                    
+                }
+
+                //******************************************************************************************************
                 //main._update_refinedTableNodeCSS(main, flexiBarIndex, main.flexiBar_X_rangeList[flexiBarIndex]);
                 //main.set_allDisplayElementCssStyle(main, flexiBarIndex, 'left');
                 //main.refresh_flexiBarCssStyle(main, flexiBarIndex, 'left');
             }
         });
         document.addEventListener("mouseup", function (e) {
-            console.log("Up", main.flexiBar_X_rangeList);
-            moveFlag = false;//關閉mousemove
+            if (moveFlag) {
+                moveFlag = false;//關閉mousemove
+                //設定最終的偏移量
+                //main.flexiBarNodeList[flexiBarIndex].X_deviation += main.flexiBar_X_rangeList[flexiBarIndex];
+                for (var index = flexiBarIndex ; index < main.flexiBarNodeList.length; index++) {
+                    main.flexiBarNodeList[index].X_deviation += main.flexiBar_X_rangeList[flexiBarIndex];
+                }
+                console.log("Up", main.flexiBar_X_rangeList, main.flexiBarNodeList[0].X_deviation, main.flexiBarNodeList[1].X_deviation, main.flexiBarNodeList[2].X_deviation, main.flexiBarNodeList[3].X_deviation, main.flexiBarNodeList[4].X_deviation);
+            }
         });
     };
     //7-1.更新指定與其相關的dispaly物件和flexi bar物件的width值與left值(update specified column width and others left, update specified flexi bar width and others left )
@@ -265,7 +285,10 @@ var TableManager = function (obj) {
             
         }
     };
-    //
+    //7-2.
+    this._update_last_X_deviation = function(mainObj, columnIndex, x_range){
+
+    }
     //this._deviation
     this.createControl = function () {
 
