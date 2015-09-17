@@ -8,26 +8,27 @@
 //建立 table 框架 rows=>tr count, columns=>td count
 var TableManager = function (obj) {
     this.data = [];
-    this.mainElement = obj.mainElement;
+    this.mainElement = obj.mainElement;             //指定注入的外部DOM父元素
     //紀錄寬度(含border,padding,不含scrollBar)
     this.width = obj.width || obj.mainElement.offsetWidth;
     //紀錄高度(含border,padding,不含scrollBar)
     this.height = obj.height || obj.mainElement.offsetHeight;
     //紀錄欄數
     this.column = obj.column || 5;
-    this.row = obj.row || 20;
-    this.gridElement;
-    this.refineNodeTable = [];
-    this.flexiBarCount = this.column;
-    this.flexiBarRootNode;
-    this.flexiBarNodeList = [];
-    this.flexiBar_X_rangeList = [];//every column last change range
-    this.X_start;
-    this.X_end;
-    this.columnWidth;//欄寬基準
-    this.rowHeight;//列高基準
-    this.flexiBarWidth = 10;
-    //
+    this.row = obj.row || 20;                       
+    this.gridElement;                               //主Grid DOM元素
+    this.refineNodeTable = [];                      //資料展示元件
+    this.flexiBarRootNode;                          //縮放元件主Node
+    this.flexiBarNodeList = [];                     //縮放元件
+    this.flexiBarCount = this.column;               //縮放元件寬度
+    this.flexiBar_X_rangeList = [];                 //紀錄每次滑鼠移動時的間距差
+    this.X_start;                                   //mousedown start position
+    this.X_end;                                     //mousemove end position
+    this.columnWidth;                               //Grid欄位的平均寬度
+    this.rowHeight;                                 //Grid列的平均高度
+    this.flexiBarWidth = 10;                        //flexi bar元件的寬度値
+    this.controlRootNode;
+    //初始化
     this.init = function () {
         //1.建立展示資料元素
         this.createDisplayNode();
@@ -39,18 +40,19 @@ var TableManager = function (obj) {
         this.refresh_allDisplayElementCssStyle();
         //5.建立flexi bar
         this.createFlexiBar();
-        //6.
+        //6.refresh flexi bar css style 
         this.refresh_flexiBarCssStyle();
-        //8.
+        //7.flexi bar bind mouse evnt and calculate X range(Closure)
         this.bind_flexiBar_event();
-        //4.綁定事件
+        //8.建立控制元件
+        this.createControl();
         //4.物件載入資料
         //5.資料顯示
     };
     //1.建立展示資料元素
     this.createDisplayNode = function () {
         //建立展示資料元素
-        this.gridElement = this.new.create("div", this.column * this.row, 's1');
+        this.gridElement = this.new.create("div", this.column * this.row, 'data_Display');
         this.mainElement.appendChild(this.gridElement);
     };
     //2.設定自定義的node結構
@@ -127,7 +129,7 @@ var TableManager = function (obj) {
             }
         }
     };
-    //5.create flexi bar and set property (flexi bar:控制Grid上每個欄位的寬度與位置)
+    //5.create flexi bar and initial property (flexi bar:控制Grid上每個欄位的寬度與位置)
     this.createFlexiBar = function () {
         var main = this,
             tmpNodes;
@@ -135,7 +137,7 @@ var TableManager = function (obj) {
         main.flexiBarRootNode = main.new.create('div', main.flexiBarCount, 'flexiBar');
         //casting to array
         tmpNodes = Array.prototype.slice.call(main.flexiBarRootNode.children);//轉成陣列元素
-        console.log('flexi Bar List', tmpNodes);
+        
         //set property into main object //iterator
         tmpNodes.forEach(function (currentElement, index, array) {
             var default_left = ((main.columnWidth * (index + 1)) - 0),//每個flexi bar的預設 X axis 位置
@@ -269,9 +271,22 @@ var TableManager = function (obj) {
         }
         mainObj.flexiBarNodeList[columnIndex].forward_width += x_range;//依據指定索引更新寬度變化量
     };
-    //this._deviation
+    //
     this.createControl = function () {
+        var main = this,
+            tmpNodes;
+        //建立控制元件
+        main.controlRootNode = main.new.create('div', 10, 'page_control');
+        //Control DOM Collection cast to Array 
+        tmpNodes = Array.prototype.slice.call(main.controlRootNode.children);//
+        //console.log('Control Node', tmpNodes);
+        //initial control property
+        tmpNodes.forEach(function (current, index, array) {
+            var data = {
 
+            }
+
+        });
     };
 };
 //shared method
