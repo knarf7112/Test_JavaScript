@@ -4,7 +4,12 @@
 //var TableManager = {
 //    'Version': '00'
 //}
+//
 //**********************************************
+/*
+    Grid參考(台北資料開放平台預覽資料用的JS)
+    slickgrid:https://github.com/mleibman/SlickGrid/blob/gh-pages/slick.grid.js
+*/
 //建立 table 框架 rows=>tr count, columns=>td count
 var TableManager = function (obj) {
     this.data = [];
@@ -27,7 +32,8 @@ var TableManager = function (obj) {
     this.columnWidth;                               //Grid欄位的平均寬度
     this.rowHeight;                                 //Grid列的平均高度
     this.flexiBarWidth = 10;                        //flexi bar元件的寬度値
-    this.controlRootNode;
+    this.pageControlRootNode;
+    this.pageControlNodeList = [];
     //初始化
     this.init = function () {
         //1.建立展示資料元素
@@ -44,8 +50,12 @@ var TableManager = function (obj) {
         this.refresh_flexiBarCssStyle();
         //7.flexi bar bind mouse evnt and calculate X range(Closure)
         this.bind_flexiBar_event();
-        //8.建立控制元件
-        this.createControl();
+        //8.建立切頁元件
+        this.createPageControl();
+        //9.設定切頁CSS
+        this.set_page_CSS();
+        //
+        this.bind_page_event();
         //4.物件載入資料
         //5.資料顯示
     };
@@ -212,7 +222,7 @@ var TableManager = function (obj) {
                 //console.log("srcollLeft", document.body.scrollLeft, "main.X_end", main.X_end, "main.X_start", main.X_start);
                 //取得移動間距差(設定目前指定索引的間距)
                 main.flexiBar_X_rangeList[flexiBarIndex] = (document.body.scrollLeft + main.gridElement.scrollLeft + main.X_end - main.X_start);//取得間距
-                console.log("Range", main.flexiBar_X_rangeList[flexiBarIndex], "Index", flexiBarIndex);
+                //console.log("Range", main.flexiBar_X_rangeList[flexiBarIndex], "Index", flexiBarIndex);
 
                 //更新flexi bar並累計最後的X軸偏移量
                 main._update_nodeCSS_CssStyle(main, flexiBarIndex, main.flexiBar_X_rangeList[flexiBarIndex], 'left');
@@ -271,21 +281,61 @@ var TableManager = function (obj) {
         }
         mainObj.flexiBarNodeList[columnIndex].forward_width += x_range;//依據指定索引更新寬度變化量
     };
-    //
-    this.createControl = function () {
+    //8.建立切頁元件
+    this.createPageControl = function () {
         var main = this,
             tmpNodes;
         //建立控制元件
-        main.controlRootNode = main.new.create('div', 10, 'page_control');
+        main.pageControlRootNode = main.new.create('div', 9, 'page_control');
         //Control DOM Collection cast to Array 
-        tmpNodes = Array.prototype.slice.call(main.controlRootNode.children);//
+        tmpNodes = Array.prototype.slice.call(main.pageControlRootNode.children);//
         //console.log('Control Node', tmpNodes);
         //initial control property
         tmpNodes.forEach(function (current, index, array) {
+             
             var data = {
-
+                index: index,
+                node: current,
+                nodeCSS: {
+                    position: "absolute",
+                    backgroundColor: "red",
+                    border: "2px solid black",
+                    width: "50px",
+                    height: "50px",
+                    left: (index * (main.width / tmpNodes.length) + 5) + "px",
+                    top: main.height + "px",
+                    textAlign: "center",
+                    //padding:"20px",
+                    lineHeight:"50px",  //下移
+                    display: "inline"
+                },
+                value: index,
+                type:"page_control"
             }
-
+            main.pageControlNodeList.push(data);
+        });
+        console.log('page Control',main.pageControlNodeList);
+        main.mainElement.appendChild(main.pageControlRootNode);
+    };
+    //9.設定切頁元件CSS
+    this.set_page_CSS = function () {
+        var main = this;
+        for (var index = 0; index < main.pageControlNodeList.length; index++) {
+            for (var propertyName in main.pageControlNodeList[index].nodeCSS) {
+                main.pageControlNodeList[index].node.style[propertyName] = main.pageControlNodeList[index].nodeCSS[propertyName];
+            }
+            main.pageControlNodeList[index].node.textContent = main.pageControlNodeList[index].value;
+        }
+    };
+    //10.綁定切頁事件
+    this.bind_page_event = function () {
+        var main = this,
+            currentIndex = -1;
+        main.pageControlNodeList.forEach(function (current,index,array) {
+            current.node.onclick = function (e) {
+                currentIndex = index;
+                console.log("page click: " + currentIndex);
+            }
         });
     };
 };

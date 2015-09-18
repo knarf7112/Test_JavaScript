@@ -32,6 +32,7 @@ var Ajax = function(method, url, sendCmd, async, callback) {
         xhr.send(data);
     }
     else {
+        //xhr.setRequestHeader("Access-Control-Allow-Origin", "*");//sever有寫才AJAX的到資料
         xhr.send(sendCmd);
     }
     
