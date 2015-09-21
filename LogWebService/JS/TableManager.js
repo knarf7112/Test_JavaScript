@@ -12,7 +12,8 @@
 */
 //建立 table 框架 rows=>tr count, columns=>td count
 var TableManager = function (obj) {
-    this.data = [];
+    this.data = [];                                 //原始資料的集合
+    this.refinedData = [];                          //重新定義的資料
     this.mainElement = obj.mainElement;             //指定注入的外部DOM父元素
     //紀錄寬度(含border,padding,不含scrollBar)
     this.width = obj.width || obj.mainElement.offsetWidth;
@@ -34,6 +35,8 @@ var TableManager = function (obj) {
     this.flexiBarWidth = 10;                        //flexi bar元件的寬度値
     this.pageControlRootNode;
     this.pageControlNodeList = [];
+    this.multiPageControlNodeList = [];             //
+    this.currentPage = 0;
     //初始化
     this.init = function () {
         //1.建立展示資料元素
@@ -91,7 +94,8 @@ var TableManager = function (obj) {
                         height: (main.rowHeight) + "px",
                         top: (rowIndex * main.rowHeight) + "px",//因以欄位為基準,所以剛好相反
                         left: (columnIndex * main.columnWidth) + "px",
-                        border: "1px solid red"
+                        border: "1px solid red",
+                        overflow: "hidden"
                     },
                     node: allChilds[elementIndex],
                     value: "",
@@ -160,7 +164,7 @@ var TableManager = function (obj) {
                     node: currentElement,       //DOM元素
                     nodeCSS: {                  //設定用CSS
                         position: "absolute",
-                        border: "1px solid yellow",
+                        //border: "1px solid yellow",
                         backgroundColor: "",
                         width: "10px",
                         height: main.height + "px",
@@ -297,17 +301,18 @@ var TableManager = function (obj) {
                 index: index,
                 node: current,
                 nodeCSS: {
-                    position: "absolute",
-                    backgroundColor: "red",
-                    border: "2px solid black",
-                    width: "50px",
-                    height: "50px",
-                    left: (index * (main.width / tmpNodes.length) + 5) + "px",
-                    top: main.height + "px",
-                    textAlign: "center",
+                    "position": "absolute",
+                    "background-color": "pink",
+                    //"border": "2px solid black",
+                    "border-radius":"10px",
+                    "width": "50px",
+                    "height": "50px",
+                    "left": (index * (main.width / tmpNodes.length) + 5) + "px",
+                    "top": main.height + 10 + "px",
+                    "text-align": "center",
                     //padding:"20px",
-                    lineHeight:"50px",  //下移
-                    display: "inline"
+                    "line-height": "50px",  //下移
+                    "display": "inline"
                 },
                 value: index,
                 type:"page_control"
@@ -321,9 +326,11 @@ var TableManager = function (obj) {
     this.set_page_CSS = function () {
         var main = this;
         for (var index = 0; index < main.pageControlNodeList.length; index++) {
+            var cssText = "";
             for (var propertyName in main.pageControlNodeList[index].nodeCSS) {
-                main.pageControlNodeList[index].node.style[propertyName] = main.pageControlNodeList[index].nodeCSS[propertyName];
+                cssText += propertyName + ":" + main.pageControlNodeList[index].nodeCSS[propertyName] + "; ";
             }
+            main.pageControlNodeList[index].node.style.cssText = cssText;
             main.pageControlNodeList[index].node.textContent = main.pageControlNodeList[index].value;
         }
     };
@@ -333,11 +340,95 @@ var TableManager = function (obj) {
             currentIndex = -1;
         main.pageControlNodeList.forEach(function (current,index,array) {
             current.node.onclick = function (e) {
-                currentIndex = index;
+                currentIndex = index + 1;
                 console.log("page click: " + currentIndex);
+                main.display_data(currentIndex);
             }
         });
     };
+    //
+    this.createMultiplePageControl = function () {
+        var main = this,
+            tmpNodes;
+        //建立控制元件
+        main.pageControlRootNode = main.new.create('div', 4, 'multiple_page_control');
+        //Control DOM Collection cast to Array 
+        tmpNodes = Array.prototype.slice.call(main.pageControlRootNode.children);//
+        //console.log('Control Node', tmpNodes);
+        //initial control property
+        tmpNodes.forEach(function (current, index, array) {
+
+            var data = {
+                index: index,
+                node: current,
+                nodeCSS: {
+                    "position": "absolute",
+                    "background-color": "red",
+                    "border": "2px solid black",
+                    "width": "50px",
+                    "height": "50px",
+                    "left": (index * (main.width / tmpNodes.length) + 5) + "px",
+                    "top": main.height + "px",
+                    "text-align": "center",
+                    //padding:"20px",
+                    "line-height": "50px",  //下移
+                    "display": "inline"
+                },
+                value: index,
+                type: "page_control"
+            }
+            main.pageControlNodeList.push(data);
+        });
+        console.log('page Control', main.pageControlNodeList);
+        main.mainElement.appendChild(main.pageControlRootNode);
+    };
+    //json data load and refine data for table format
+    this.JsonDataLoad = function (JsonData) {
+        if (!!JsonData) {
+            this.data.push(JsonData);
+            this.refine_JsonData(JsonData);
+            this.display_data(1);
+        }
+    };
+    this.refine_JsonData = function (jsonData) {
+        if (jsonData instanceof Array) {
+
+            var everyRowCount = this.row - 1;//every page include header in row 0 so minus 1
+            var currentPage,
+                columnIndex,
+                currentRowIndex,
+                refinedData = this.refinedData;//給個指標,否則下面的func會指回Winodw
+
+            jsonData.forEach(function (currentObj, index, array) {
+                currentPage = Math.floor(index / everyRowCount) + 1;//page start is 1 [page 0 is undefined]
+                columnIndex = 0;
+                currentRowIndex = index % everyRowCount;//當前的列索引 = 當前索引除以列總數的餘數
+                //從json物件列舉所有資料並做設定
+                for (var propertyName in currentObj) {
+                    //若為每一頁的第一個資料物件
+                    if (currentRowIndex === 0) {
+                        refinedData[currentPage] = refinedData[currentPage] || [];//若沒設定過給column設定一個陣列,若有設定過則用當前的
+                        var rowArray = [propertyName];//插入一個新的row陣列
+                        refinedData[currentPage].push(rowArray);//將每個column都插上一個新row
+                        //console.log(refinedData[currentPage][columnIndex]);
+                    }
+                    refinedData[currentPage][columnIndex].push(currentObj[propertyName]);
+                    columnIndex++;
+                }
+            });
+            console.log('refined array', this.refinedData);//[page][column][row] => page:[column:[row:[]]]
+        }
+    };
+    //
+    this.display_data = function(pageIndex){
+        var main = this;
+        for(var columnIndex = 0; columnIndex < main.refineNodeTable.length;columnIndex++){
+            for(var rowIndex = 0; rowIndex < main.refineNodeTable[columnIndex].length;rowIndex++){
+                main.refineNodeTable[columnIndex][rowIndex].value = main.refinedData[pageIndex][columnIndex][rowIndex] || "";
+                main.refineNodeTable[columnIndex][rowIndex].node.textContent = main.refineNodeTable[columnIndex][rowIndex].value;
+            }
+        }
+    }
 };
 //shared method
 TableManager.prototype.new = {
